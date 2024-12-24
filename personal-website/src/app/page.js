@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion } from "motion/react";
 import MatrixEffect from "@/utility/randomText.js";
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 
 const Scene = () => {
@@ -11,6 +12,7 @@ const Scene = () => {
   const scene  = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.z= 5;
+  const loader = new GLTFLoader();
   const renderer = new THREE.WebGLRenderer();
 
 }
