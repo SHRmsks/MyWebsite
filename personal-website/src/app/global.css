@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
+
+@font-face {
+    font-family: "cyberpunk";
+    src: url('/Cyberpunk.ttf') format('truetype');
+    font-weight: 400;
+  
+}
+
+@font-face {
+    font-family: "slant";
+    src: url('/slant.ttf') format('truetype');
+    font-weight: 600;
+  
+}
+
+
+@font-face {
+    font-family: "text";
+    src: url('/text.ttf') format('truetype');
+    font-weight: 400;
+  
+}
