@@ -8,8 +8,8 @@ import { motion} from "motion/react";
 const SKdiv = ({pjName, pjLink})=> {
     const [hover, setHover] = useState(false);
     return(
-        <div className="bg-[url('./skillT1.png')] bg-no-repeat bg-contain w-fit h-fit">
-
+        <div className="bg-[url('/skillT1.png')] bg-no-repeat bg-contain w-fit h-fit flex flex-col justify-center items-center rounded-md" onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
+            <p className="text-center tetx-[]" ></p>
 
         </div>
      )
