@@ -8,12 +8,13 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: { cyberpunk: "cyberpunk",
-        slant: "slant",
-        text: "text"
-      },
+      fontFamily: { cyberpunk: "cyberpunk", slant: "slant", text: "text" },
       backgroundImage: {
         "cyber-container": "url('/CyberDiv.png')",
+        "map": "url('/map.jpg')",
+      },
+      boxShadow: {
+        'bottom': '0 4px 6px -1px rgba(192, 242, 237, 0.9)',
       },
       colors: {
         background: "var(--background)",

@@ -8,6 +8,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
+import Link from "next/link";
+import { easeInOut } from "motion";
 // import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 const Scene = () => {
@@ -27,10 +29,10 @@ const Scene = () => {
 
     ref.current.appendChild(renderer.domElement);
 
-    const light = new THREE.AmbientLight(0x5ef6ef, 10);
+    const light = new THREE.AmbientLight(0x5ef6ef, 1);
     const pointLight = new THREE.PointLight(0x5ef6ef, 10, 10, 2);
     pointLight.position.set(5, 3, 3);
-    const directionalLight = new THREE.DirectionalLight(0x5ef6ef, 20);
+    const directionalLight = new THREE.DirectionalLight(0x5ef6ef, 5);
     directionalLight.position.set(10, 10, 10); // Position it above and to the side
     scene.add(directionalLight);
 
@@ -78,6 +80,17 @@ const Scene = () => {
         camera.position.z = 4;
         camera.position.y = 5; // controls the height of the camera
         camera.lookAt(0, 2, 0);
+
+        if (model) {
+          model.traverse((child) => {
+            if (child.isMesh) {
+              console.log("Is Mesh");
+            } else {
+              console.log("Not Mesh" + child.name + child.type);
+            }
+            // console.log("Properties:", Object.keys(child));
+          });
+        }
       },
       undefined,
       (err) => {
@@ -125,6 +138,9 @@ const Main = () => {
   const [IP, setIP] = useState("");
   const [os, setOS] = useState("unknown");
   const [shaking, setShaking] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [Glitter, setGlitter] = useState("glitter");
+
   useEffect(() => {
     fetch("/api/ip")
       .then((res) => res.json())
@@ -137,7 +153,8 @@ const Main = () => {
 
   const loadingT = "Hacking in ...";
   const intro =
-    "I am a studying Maths and Computer Science at Boston University. I have learned the intermediated level of Python, Java, and the basic knowledge of FrontEnd. I am currently a a member of BUCSSA(Boston University Chinese Student Scholar Association) Technological Department, and my job is building web pages and illustrating effects. I am also very thrilled about all the connections to BackEnd, especially building a database with vector search. Feel free to contact me!";
+    // "I am a studying Maths and Computer Science at Boston University. I have learned the intermediated level of Python, Java, and the basic knowledge of FrontEnd. I am currently a a member of BUCSSA(Boston University Chinese Student Scholar Association) Technological Department, and my job is building web pages and illustrating effects. I am also very thrilled about all the connections to BackEnd, especially building a database with vector search. Feel free to contact me!";
+    "fs";
   const [loaded, setLoaded] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -154,29 +171,67 @@ const Main = () => {
     shard: {
       clipPath: [
         "polygon(0 0, 0 0, 0 0, 0 0)",
+        "polygon(0 0, 50% 0, 0 50%, 0 50%)",
         "polygon(0 0, 100% 0, 0% 100%, 0 100%)",
+        // "polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 0)",
         "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
       ],
-      x: [0, -2, 2],
-      y: [0, 2, -2],
-      z: [0, 0, 0],
-      transition: { duration: 2, ease: "easeInOut" },
+      x: [0, 5, -5, 5, 0],
+      y: [0, 5, -5, 5, 0],
+      z: [0, 0, 0, 0, 0],
+      transition: { duration: 0.8, ease: "easeInOut" },
     },
+  };
+  const glitter = {
+    initial: { opacity: 0 },
+    glitter: {
+      opacity: [0, 0.3, 0.2, 0.5, 0.3, 0.8, 1],
+      x: [0, -1, 1, -2, 2, -1, 0],
+      y: [0, -1, 1, -2, 2, -1, 0],
+      transition: {
+        duration: 1,
+        ease: "easeInOut",
+        repeat: Infinity,
+      },
+    },
+    static: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+    },
+    transition: { duration: 0.3, ease: " " },
   };
 
   const shakeVariants = {
-    idle: { x: 0, y: 0 },
+    idle: { x: 0, y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeInOut" } },
     shake: {
-      x: [0, -4, 4, -4, 4, 0],
-      
+      opacity:  [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
+      x: [0, -1, 1, -2, 2, -1, 0],
+      y: [0, -1, 1, -2, 2, -1, 0],
       transition: {
-        duration: 0.8,
+        duration: 0.6,
         ease: "easeInOut",
-        repeat: 2,
-        repeatType: "mirror",
+        repeat: Infinity,
+      
       },
     },
   };
+
+  useEffect(() => {
+    if (hover) {
+      setTimeout(() => {
+        setGlitter("static");
+      }, 1000);
+    } else {
+      setGlitter("glitter");
+    }
+    if (shaking) {
+      setTimeout(() => {
+        setShaking(false);
+      }, 600);
+    }
+  }, [hover,shaking]);
+
   return (
     <div className="relative h-screen  w-screen bg-[#FEE801] justify-center px-[1%] pt-[1%]">
       <div className="relative w-full h-full">
@@ -184,7 +239,11 @@ const Main = () => {
           <h1 className="text-[#00060e] text-[60px] font-bold font-slant">
             Welcome to Haoran's Website
           </h1>
-          <Nav />
+          <Nav
+            one={{ name: "Projects", link: "./Projects" }}
+            two={{ name: "About Me", link: "./About" }}
+            third={{ name: "Contact", link: "./Contact" }}
+          />
         </div>
 
         {/* the div */}
@@ -228,11 +287,48 @@ const Main = () => {
             )}
 
             {done ? (
-              <motion.div variants={Sharding} initial="initial" animate="shard"  onAnimationComplete={() => setTimeout(() => setShaking(true), 100)}>
-                <motion.div className="w-[60%] aspect-[16/9] bg-[url('/map.jpg')] bg-contain bg-center bg-no-repeat rounded-[10px]" variants={shakeVariants} animate={shaking? "shake": "idle"}></motion.div>
-              </motion.div>
+              <div className="relative w-full h-auto py-1  gap-x-2">
+                <motion.div
+                  variants={Sharding}
+                  initial="initial"
+                  animate="shard"
+                  onAnimationComplete={() =>
+                    setTimeout(() => setShaking(true), 100)
+                  }
+                >
+                  <motion.div
+                    onMouseEnter={() => setHover(true)}
+                    onMouseLeave={() => setHover(false)}
+                    className="relative z-[5] w-[60%] aspect-[16/9] bg-map
+         bg-contain bg-center bg-no-repeat rounded-[10px] border border-blue-500  shadow-bottom"
+                    variants={shakeVariants}
+                    animate={shaking ? "shake" : "idle"}
+                  ></motion.div>
+                </motion.div>
+                {hover && (
+                  <motion.div
+                    key={Glitter}
+                    className=" absolute flex flex-col justify-center gap-y-4 items-center text-start text- top-0 right-[2px] bg-[url('/Card.png')] bg-no-repeat bg-cover bg-center w-[30%] min-w-[200px] h-full z-10"
+                    variants={glitter}
+                    initial="initial"
+                    animate={Glitter}
+                  >
+                    <p className="text-[12px] font-text text-[#39c4b6] text-wrap break-words">
+                      {" "}
+                      Info detected: <br />
+                    </p>
+                    <p className="text-[12px] font-text text-[#39c4b6] text-wrap break-words ">
+                      Name: Haoran <br />
+                      Age: 21 <br />
+                      Gender: Male <br />
+                      Location: China <br />
+                      Affiliation: BU <br />
+                      Title: Noobie <br />
+                    </p>
+                  </motion.div>
+                )}
+              </div>
             ) : null}
-            <></>
           </div>
         </div>
       </div>
