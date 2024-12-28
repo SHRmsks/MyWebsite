@@ -4,7 +4,7 @@ import "../app/global.css";
 import { motion } from "motion/react";
 
 const MatrixText =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?><Ξ⟟⩚⨀ʬǃ☲⫷⧖𐋅";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?><Ξ⟟⩚⨀ʬǃ☲⫷⧖𐋅你烦我乏味啊踢人给我搞了";
 
 const MatrixEffect = ({ finalText, speed, flickerspeed, callback }) => {
   const [displayText, setDisplayText] = useState("");

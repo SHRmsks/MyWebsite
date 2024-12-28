@@ -203,16 +203,20 @@ const Main = () => {
   };
 
   const shakeVariants = {
-    idle: { x: 0, y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeInOut" } },
+    idle: {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeInOut" },
+    },
     shake: {
-      opacity:  [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
+      opacity: [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
       x: [0, -1, 1, -2, 2, -1, 0],
       y: [0, -1, 1, -2, 2, -1, 0],
       transition: {
         duration: 0.6,
         ease: "easeInOut",
         repeat: Infinity,
-      
       },
     },
   };
@@ -230,7 +234,7 @@ const Main = () => {
         setShaking(false);
       }, 600);
     }
-  }, [hover,shaking]);
+  }, [hover, shaking]);
 
   return (
     <div className="relative h-screen  w-screen bg-[#FEE801] justify-center px-[1%] pt-[1%]">
@@ -252,7 +256,7 @@ const Main = () => {
             <div className="bg-contain bg-no-repeat bg-center w-[80px] h-[80px] bg-[url('/deco.png')]"></div>
 
             <MatrixEffect
-              finalText={IP ? `user detected: ${IP}` : ""}
+              finalText={IP ? `IP detected: ${IP}` : ""}
               speed={50}
               flickerspeed={30}
             ></MatrixEffect>
