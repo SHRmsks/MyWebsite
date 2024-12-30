@@ -17,17 +17,17 @@ const Nav = ({one, two, third}) => {
 
     return (
       
-      <div className="xl:w-[40%] xl:relative xl:h-[80px] flex flex-col justify-around gap-y-2 px-[10px] ">
+      <div className="xl:w-[40%] xl:relative xl:h-[50px] flex flex-col justify-around gap-y-2 px-[10px] ">
         <div className="  flex flex-row justify-end items-center">
-          <div className=" absolute flex flex-row w-[80%] justify-evenly gap-x-2 right-0 py-3">
-            <a className="text-center text-nowrap font-cyberpunk text-[20px] text-[#54c1e6]" href={oneLink}>
+          <div className=" absolute flex flex-row w-[80%] justify-evenly gap-x-2 right-0 py-1">
+            <a className="text-center text-nowrap font-cyberpunk text-[15px] text-[#54c1e6]" href={oneLink}>
               {" "}
              {oneName}
             </a>
-            <a className="text-center text-nowrap font-cyberpunk text-[20px] text-[#54c1e6]" href={twoLink}>
+            <a className="text-center text-nowrap font-cyberpunk text-[15px] text-[#54c1e6]" href={twoLink}>
               {twoName}
             </a>
-            <a className="text-center text-nowrap font-cyberpunk text-[20px] text-[#54c1e6]" href ={thirdLink}> 
+            <a className="text-center text-nowrap font-cyberpunk text-[15px] text-[#54c1e6]" href ={thirdLink}> 
               {" "}
               {thirdName}
             </a>

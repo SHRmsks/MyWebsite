@@ -239,19 +239,19 @@ const Main = () => {
   return (
     <div className="relative h-screen  w-screen bg-[#FEE801] justify-center px-[1%] pt-[1%]">
       <div className="relative w-full h-full">
-        <div className="relative w-full h-fit flex flex-row justify-between xl:px-20">
+        <div className="relative w-full h-fit flex flex-row justify-between items-center ">
           <h1 className="text-[#00060e] text-[60px] font-bold font-slant">
             Welcome to Haoran's Website
           </h1>
+      
           <Nav
             one={{ name: "Projects", link: "./Projects" }}
             two={{ name: "About Me", link: "./About" }}
             third={{ name: "Contact", link: "./Contact" }}
-          />
-        </div>
+          /></div>
 
         {/* the div */}
-        <div className="flex relative  rounded-2xl flex-row w-[60%] h-[80%] justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e] overflow-hidden">
+        <div className="flex relative  rounded-2xl flex-row w-[80%] h-[80%] justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e] overflow-hidden">
           <div className="relative flex flex-col gap-y-[10px] py-[10px] w-[30%] h-full">
             <div className="bg-contain bg-no-repeat bg-center w-[80px] h-[80px] bg-[url('/deco.png')]"></div>
 
