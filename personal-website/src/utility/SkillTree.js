@@ -3,15 +3,27 @@ import React, { useState, useEffect } from "react";
 import "../app/global.css";
 import { motion } from "motion/react";
 import Text from "./text";
-const SKdiv = ({ pjName, pjLink, skills }) => {
+const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
   const [ratio, setRatio] = useState(null);
+  const [ratio2, setRatio2] = useState(null);
+ 
   useEffect(() => {
     const img = new Image();
+    const img2 = new Image();
+    const img3 = new Image();
+    img3.src = Icon;
+    console.log("icon", Icon);
     img.src = "/skillT1.png";
+    img2.src = "/int.png";
     img.onload = () => {
       setRatio(img.naturalWidth / img.naturalHeight);
     };
-  }, [ratio]);
+    img2.onload = () => {
+      setRatio2(img2.naturalWidth / img2.naturalHeight);
+    };
+   
+
+  }, [ratio, ratio2]);  
   const [load, setLoad] = useState(false);
   const glitter = {
     initial: {
@@ -83,7 +95,6 @@ const SKdiv = ({ pjName, pjLink, skills }) => {
   const managementPTS = skills.managementPTS || 0;
   const AlgoPTS = skills.algoPTS || 0;
 
-
   return (
     <>
       {ratio && (
@@ -101,13 +112,19 @@ const SKdiv = ({ pjName, pjLink, skills }) => {
             // onHoverEnd={EndHandler}
             className="flex flex-row justify-center items-center w-[60%] h-[90%]  "
           >
-            <div className="relative w-[90%] h-[90%] flex flex-col justify-around items-center sm:py-3">
-              <Text Title={"Project Name: "} text={pjName} />
-              <Text Title={"Attributes of SkillPoints"} text={
-               `Front-end: 7\nBack-end: 6\nDatabase: 4\nDesign: 2\nManagement: 3\nAlgorithms: 0`
-              }/>
+            <div className="relative w-[90%] h-[90%] flex flex-col justify-center items-center">
+              <Text Title={"Project Name: "} text={pjName} size={"10px"}/>
+              <>
+                    <Text Title= {"Framework: "} size={"12px"} text={framework} icon={Icon}/>
+              <p className="text-[#39c4b6] m-0 text-[10px] font-text text-start text-wrap break-words drop-shadow-text_bottom">An easy team-managemnt App that derived from website</p>
+              </>
+              <Text
+                Title={"Attributes of SkillPoints"}
+                size={"10px"}
+                text={`Front-end: ${frontEndPTS}\nBack-end: ${backEndPTS}\nDatabase: ${databasePTS}\nDesign: ${designPTS}\nManagement: ${managementPTS}\nAlgorithms: ${AlgoPTS}\n`}
+              />
 
-              <div className="self-center bg-[url('/int.png')] bg-no-repeat bg-contain w-[20px] h-[20px]"></div>
+              <img src= "/int.png" style = {{height: ratio2? `${20/ratio2}px`: `auto`}} className="w-[20px] "/>
             </div>
           </motion.div>
         </div>
@@ -136,10 +153,10 @@ const SKdiv = ({ pjName, pjLink, skills }) => {
     </>
   );
 };
-const SkillTree = ({link, skills}) => {
+const SkillTree = ({ link, skills, framework, Icon}) => {
   return (
     <div className="bg-[url('/background.png')] bg-cover h-full w-full bg-no-repeat  bg-center flex rounded-sm px-2 py-[5px]">
-      <SKdiv pjName={"Work Shifts Management"} pjLink={link} skills={skills}/>
+      <SKdiv pjName={"Work Shifts Management"} pjLink={link} skills={skills} framework={framework} Icon = {Icon} />
     </div>
   );
 };
