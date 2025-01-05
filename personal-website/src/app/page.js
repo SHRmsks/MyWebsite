@@ -8,8 +8,6 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
-import Link from "next/link";
-import { easeInOut } from "motion";
 // import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 const Scene = () => {
@@ -17,9 +15,9 @@ const Scene = () => {
   useEffect(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
-      60,
+      65,
       window.innerWidth / window.innerHeight,
-      0.01,
+      0.1,
       1000
     );
 
@@ -110,7 +108,7 @@ const Scene = () => {
     animate();
 
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = ref.current.offsetWidth / ref.current.offsetHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(ref.current.offsetWidth, ref.current.offsetHeight);
       composer.setSize(ref.current.offsetWidth, ref.current.offsetHeight);
@@ -142,6 +140,8 @@ const Main = () => {
   const [Glitter, setGlitter] = useState("glitter");
 
   useEffect(() => {
+    console.log("DPR" + window.devicePixelRatio);
+    console.log(window.innerWidth);
     fetch("/api/ip")
       .then((res) => res.json())
       .then((data) => {
@@ -237,18 +237,23 @@ const Main = () => {
   }, [hover, shaking]);
 
   return (
-    <div className="relative h-screen  w-screen bg-[#FEE801] justify-center px-[1%] pt-[1%]">
+
+
+
+
+    <div className="relative min-h-full w-screen bg-[#FEE801] justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
         <div className="relative w-full h-fit flex flex-row justify-between items-center ">
-          <h1 className="text-[#00060e] text-[60px] font-bold font-slant">
+          <h1 className="text-[#00060e] font-bold font-slant sm-dpr-1:text-[30px] sm-dpr-2:text-[20px] sm-dpr-3:text-[15px] md-dpr-1:text-[50px] md-dpr-2:text-[40px] md-dpr-3:text-[30px] lg-dpr-1:text-[60px] lg-dpr-2:text-[40px] lg-dpr-3:text-[30px] xl-dpr-1:text-[60px] xl-dpr-2:text-[40px] xl-dpr-3:text-[30px] xxl-dpr-1:text-[60px] xxl-dpr-2:text-[50px] xxl-dpr-3:text-[40px] xxxl-dpr-1:text-[60px] xxxl-dpr-2:text-[50px] xxxl-dpr-3:text-[40px]">
             Welcome to Haoran's Website
           </h1>
-      
+
           <Nav
             one={{ name: "Projects", link: "./Projects" }}
             two={{ name: "About Me", link: "./About" }}
             third={{ name: "Contact", link: "./Contact" }}
-          /></div>
+          />
+        </div>
 
         {/* the div */}
         <div className="flex relative  rounded-2xl flex-row w-[80%] h-[80%] justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e] overflow-hidden">

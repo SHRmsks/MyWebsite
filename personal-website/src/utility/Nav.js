@@ -17,9 +17,9 @@ const Nav = ({one, two, third}) => {
 
     return (
       
-      <div className="xl:w-[40%] xl:relative xl:h-[50px] flex flex-col justify-around gap-y-2 px-[10px] ">
+      <div className="w-[40%] flex flex-col justify-around gap-y-2 md-dpr-1:h-[40px] md-dpr-2:h-[30px] md-dpr-3:h-[15px] lg-dpr-1:h-[45px] lg-dpr-2:h-[40px] lg-dpr-3:h-[30px] xl-dpr-1:h-[50px] xl-dpr-2:h-[30px] xl-dpr-3:text-[25px] xxl-dpr-1:h-[60px] xxl-dpr-2:h-[50px] xxl-dpr-3:h-[30px] xxxl-dpr-1:h-[80px] xxxl-dpr-2:h-[60px] xxxl-dpr-3:h-[50px] ">
         <div className="  flex flex-row justify-end items-center">
-          <div className=" absolute flex flex-row w-[80%] justify-evenly gap-x-2 right-0 py-1">
+          <div className=" flex w-[90%] flex-row justify-evenly gap-x-2 py-1">
             <a className="text-center text-nowrap font-cyberpunk text-[15px] text-[#54c1e6]" href={oneLink}>
               {" "}
              {oneName}

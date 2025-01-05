@@ -9,8 +9,37 @@ export default {
   theme: {
     extend: {
       screens: {
-        '2xl': '1920px',
-        "3xl": '2560px',
+        "sm-dpr-1": {raw: `(min-width: 640px) and  (min-device-pixel-ratio: 1) and (max-device-pixel-ratio: 1.99),  (min-width: 640px) and (-webkit-min-device-pixel-ratio: 1) and (-webkit-max-device-pixel-ratio: 1.99)`},
+
+        "sm-dpr-2": {raw: `
+        (min-width: 640px) and (min-device-pixel-ratio: 2) and (max-device-pixel-ratio: 2.99),
+        (min-width: 640px) and (-webkit-min-device-pixel-ratio: 2) and (-webkit-max-device-pixel-ratio: 2.99)
+      `},
+        "sm-dpr-3": {raw: `(min-width: 640px) and  (min-device-pixel-ratio: 3), (min-width: 640px) and (-webkit-min-device-pixel-ratio: 3)`},
+
+        "md-dpr-1": {raw: `(min-width: 768px) and  (min-device-pixel-ratio: 1) and (max-device-pixel-ratio: 1.99),  (min-width: 768px) and (-webkit-min-device-pixel-ratio: 1) and (-webkit-max-device-pixel-ratio: 1.99)`},
+      
+        "md-dpr-2": { raw: `
+        (min-width: 768px) and (min-device-pixel-ratio: 2) and (max-device-pixel-ratio: 2.99),
+        (min-width: 768px) and (-webkit-min-device-pixel-ratio: 2) and (-webkit-max-device-pixel-ratio: 2.99)
+      `,
+       
+},
+        "md-dpr-3": {raw: `(min-width: 768px) and  (min-device-pixel-ratio: 3), (min-width: 768px) and (-webkit-min-device-pixel-ratio: 3)`},
+        
+        "lg-dpr-1": {raw: `(min-width: 1024px) and  (min-device-pixel-ratio: 1) and (max-device-pixel-ratio: 1.99),  (min-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) and (-webkit-max-device-pixel-ratio: 1.99)`},
+        "lg-dpr-2": {raw: `(min-width: 1024px) and  (min-device-pixel-ratio: 2) and (max-device-pixel-ratio: 2.99),  (min-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (-webkit-max-device-pixel-ratio: 2.99)`},
+        "lg-dpr-3": {raw: `(min-width: 1024px) and  (min-device-pixel-ratio: 3),  (min-width: 1024px) and (-webkit-min-device-pixel-ratio: 3)`},
+        "xl-dpr-1": {raw: `(min-width: 1280px) and  (min-device-pixel-ratio: 1) and (max-device-pixel-ratio: 1.99),  (min-width: 1280px) and (-webkit-min-device-pixel-ratio: 1) and (-webkit-max-device-pixel-ratio: 1.99)`},
+          "xl-dpr-2": {raw: `(min-width: 1280px) and  (min-device-pixel-ratio: 2) and (max-device-pixel-ratio: 2.99),  (min-width: 1280px) and (-webkit-min-device-pixel-ratio: 2) and (-webkit-max-device-pixel-ratio: 2.99)`},
+        "xl-dpr-3": {raw: `(min-width: 1280px) and  (min-device-pixel-ratio: 3),  (min-width: 1280px) and (-webkit-min-device-pixel-ratio: 3)`},
+        "xxl-dpr-1": {raw: `(min-width: 1920px) and  (min-device-pixel-ratio: 1) and (max-device-pixel-ratio: 1.99),  (min-width: 1920px) and (-webkit-min-device-pixel-ratio: 1) and (-webkit-max-device-pixel-ratio: 1.99)`},
+        "xxl-dpr-2": {raw: `(min-width: 1920px) and  (min-device-pixel-ratio: 2) and (max-device-pixel-ratio: 2.99),  (min-width: 1920px) and (-webkit-min-device-pixel-ratio: 2) and (-webkit-max-device-pixel-ratio: 2.99)`},
+        "xxl-dpr-3": {raw: `(min-width: 1920px) and  (min-device-pixel-ratio: 3),  (min-width: 1920px) and (-webkit-min-device-pixel-ratio: 3)`},
+        "xxxl-dpr-1": {raw: `(min-width: 2560px) and  (min-device-pixel-ratio: 1) and (max-device-pixel-ratio: 1.99),  (min-width: 2560px) and (-webkit-min-device-pixel-ratio: 1) and (-webkit-max-device-pixel-ratio: 1.99 )`},
+        "xxxl-dpr-2": {raw: `(min-width: 2560px) and  (min-device-pixel-ratio: 2) and (max-device-pixel-ratio: 2.99),  (min-width: 2560px) and (-webkit-min-device-pixel-ratio: 2) and (-webkit-max-device-pixel-ratio: 2.99)`},
+        "xxxl-dpr-3": {raw: `(min-width: 2560px) and  (min-device-pixel-ratio: 3),  (min-width: 2560px) and (-webkit-min-device-pixel-ratio: 3)`},
+
       },
       fontFamily: { cyberpunk: "cyberpunk", slant: "slant", text: "text" },
       backgroundImage: {

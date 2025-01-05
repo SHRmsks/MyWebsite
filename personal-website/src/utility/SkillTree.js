@@ -3,16 +3,16 @@ import React, { useState, useEffect } from "react";
 import "../app/global.css";
 import { motion } from "motion/react";
 import Text from "./text";
-const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
+const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
   const [ratio, setRatio] = useState(null);
   const [ratio2, setRatio2] = useState(null);
- 
+
   useEffect(() => {
     const img = new Image();
     const img2 = new Image();
     const img3 = new Image();
     img3.src = Icon;
-    console.log("icon", Icon);
+    // console.log("icon", Icon);
     img.src = "/skillT1.png";
     img2.src = "/int.png";
     img.onload = () => {
@@ -21,9 +21,7 @@ const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
     img2.onload = () => {
       setRatio2(img2.naturalWidth / img2.naturalHeight);
     };
-   
-
-  }, [ratio, ratio2]);  
+  }, [ratio, ratio2]);
   const [load, setLoad] = useState(false);
   const glitter = {
     initial: {
@@ -113,10 +111,17 @@ const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
             className="flex flex-row justify-center items-center w-[60%] h-[90%]  "
           >
             <div className="relative w-[90%] h-[90%] flex flex-col justify-center items-center">
-              <Text Title={"Project Name: "} text={pjName} size={"10px"}/>
+              <Text Title={"Project Name: "} text={pjName} size={"10px"} />
               <>
-                    <Text Title= {"Framework: "} size={"12px"} text={framework} icon={Icon}/>
-              <p className="text-[#39c4b6] m-0 text-[10px] font-text text-start text-wrap break-words drop-shadow-text_bottom">An easy team-managemnt App that derived from website</p>
+                <Text
+                  Title={"Framework: "}
+                  size={"12px"}
+                  text={framework}
+                  icon={Icon}
+                />
+                <p className="text-[#39c4b6] m-0 text-[10px] font-text text-start text-wrap break-words drop-shadow-text_bottom">
+                  {intro}
+                </p>
               </>
               <Text
                 Title={"Attributes of SkillPoints"}
@@ -124,7 +129,11 @@ const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
                 text={`Front-end: ${frontEndPTS}\nBack-end: ${backEndPTS}\nDatabase: ${databasePTS}\nDesign: ${designPTS}\nManagement: ${managementPTS}\nAlgorithms: ${AlgoPTS}\n`}
               />
 
-              <img src= "/int.png" style = {{height: ratio2? `${20/ratio2}px`: `auto`}} className="w-[20px] "/>
+              <img
+                src="/int.png"
+                style={{ height: ratio2 ? `${20 / ratio2}px` : `auto` }}
+                className="w-[20px] "
+              />
             </div>
           </motion.div>
         </div>
@@ -135,7 +144,7 @@ const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
           className="bg-opacity-30 backdrop-blur-md bg-slate-400 flex absolute inset-0 z-10 w-full h-full justify-center items-center rounded-sm"
         >
           <motion.div className="w-[80%] flex justify-center items-center h-[80%] z-20 rounded-md overflow-hidden">
-            {isPreview && (
+            {isPreview && local && (
               <motion.video
                 src={pjLink}
                 autoPlay
@@ -147,17 +156,33 @@ const SKdiv = ({ pjName, pjLink, skills, framework, Icon}) => {
                 animate="animate"
               ></motion.video>
             )}
+            {isPreview && !local && (
+              <iframe
+                
+                src={pjLink}
+                title={"pjName"}
+                className="w-[90%] h-[90%] py-1 ob"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
           </motion.div>
         </div>
       )}
     </>
   );
 };
-const SkillTree = ({ link, skills, framework, Icon}) => {
+const SkillTree = ({ link, skills, framework, Icon, intro, pjName, local }) => {
   return (
-    <div className="bg-[url('/background.png')] bg-cover h-full w-full bg-no-repeat  bg-center flex rounded-sm px-2 py-[5px]">
-      <SKdiv pjName={"Work Shifts Management"} pjLink={link} skills={skills} framework={framework} Icon = {Icon} />
-    </div>
+    <SKdiv
+      local={local}
+      pjName={pjName}
+      pjLink={link}
+      skills={skills}
+      framework={framework}
+      Icon={Icon}
+      intro={intro}
+    />
   );
 };
 export default SkillTree;

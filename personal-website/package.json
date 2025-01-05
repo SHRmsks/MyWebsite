@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@xyflow/react": "^12.3.6",
+    "chart.js": "^4.4.7",
     "motion": "^11.15.0",
     "next": "15.1.2",
     "react": "^19.0.0",
