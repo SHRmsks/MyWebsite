@@ -45,11 +45,13 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
     },
   };
   useEffect(() => {
+    let LoadEffect = null; 
     if (!load) {
-      setTimeout(() => {
+     LoadEffect = setTimeout(() => {
         setLoad(true);
       }, 800);
     }
+    if (LoadEffect) clearTimeout(LoadEffect);
   }, [load]);
 
   const [tap, setTap] = useState(false);

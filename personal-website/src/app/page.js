@@ -138,10 +138,12 @@ const Main = () => {
   const [shaking, setShaking] = useState(false);
   const [hover, setHover] = useState(false);
   const [Glitter, setGlitter] = useState("glitter");
-
+  const [LoadingNumber, setLoadingNumber] = useState(-1);
+  const [doneL, setDoneL] = useState(false);
   useEffect(() => {
-    console.log("DPR" + window.devicePixelRatio);
-    console.log(window.innerWidth);
+    const controller = new AbortController();
+    // console.log("DPR" + window.devicePixelRatio);
+    // console.log(window.innerWidth);
     fetch("/api/ip")
       .then((res) => res.json())
       .then((data) => {
@@ -149,9 +151,12 @@ const Main = () => {
         setOS(data.os);
       })
       .catch((err) => console.error(err));
+    return () => controller.abort();
   }, []);
 
   const loadingT = "Hacking in ...";
+  const loadingN = `Data Breaching: ${LoadingNumber}%`;
+
   const intro =
     // "I am a studying Maths and Computer Science at Boston University. I have learned the intermediated level of Python, Java, and the basic knowledge of FrontEnd. I am currently a a member of BUCSSA(Boston University Chinese Student Scholar Association) Technological Department, and my job is building web pages and illustrating effects. I am also very thrilled about all the connections to BackEnd, especially building a database with vector search. Feel free to contact me!";
     "fs";
@@ -160,7 +165,28 @@ const Main = () => {
 
   const loadedCallback = () => {
     setLoaded(true);
+    loadingNumberHandler();
   }; // callback for the loaded state
+
+
+
+  const loadingNumberHandler = () => {
+    if(!doneL){
+      const interval = setInterval(() =>{
+        setLoadingNumber((prev)=> {
+          if (prev<100){
+            return prev+1
+          }
+          else{
+            clearInterval(interval); 
+           setTimeout(()=> setDoneL(true), 2000); 
+           return prev
+          }
+        })
+      }, 50)
+    }
+  }
+
 
   const doneCallback = () => {
     setDone(true);
@@ -199,7 +225,7 @@ const Main = () => {
       x: 0,
       y: 0,
     },
-    transition: { duration: 0.3, ease: " " },
+    transition: { duration: 0.3, ease: "easeInOut" },
   };
 
   const shakeVariants = {
@@ -222,26 +248,28 @@ const Main = () => {
   };
 
   useEffect(() => {
+    let glitterTimeout = null;
+    let shakingTimeout = null;
     if (hover) {
-      setTimeout(() => {
+      glitterTimeout = setTimeout(() => {
         setGlitter("static");
       }, 1000);
     } else {
       setGlitter("glitter");
     }
     if (shaking) {
-      setTimeout(() => {
+      shakingTimeout = setTimeout(() => {
         setShaking(false);
       }, 600);
     }
-  }, [hover, shaking]);
+    return () => {
+      if (glitterTimeout) clearTimeout(glitterTimeout);
+      if (shakingTimeout) clearTimeout(shakingTimeout);
+    };
+  }, [hover, shaking, doneL]);
 
   return (
-
-
-
-
-    <div className="relative min-h-full w-screen bg-[#FEE801] justify-center px-[1%] py-[1%]">
+    <div className="relative h-screen w-screen bg-[#FEE801] justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
         <div className="relative w-full h-fit flex flex-row justify-between items-center ">
           <h1 className="text-[#00060e] font-bold font-slant sm-dpr-1:text-[30px] sm-dpr-2:text-[20px] sm-dpr-3:text-[15px] md-dpr-1:text-[50px] md-dpr-2:text-[40px] md-dpr-3:text-[30px] lg-dpr-1:text-[60px] lg-dpr-2:text-[40px] lg-dpr-3:text-[30px] xl-dpr-1:text-[60px] xl-dpr-2:text-[40px] xl-dpr-3:text-[30px] xxl-dpr-1:text-[60px] xxl-dpr-2:text-[50px] xxl-dpr-3:text-[40px] xxxl-dpr-1:text-[60px] xxxl-dpr-2:text-[50px] xxxl-dpr-3:text-[40px]">
@@ -256,7 +284,7 @@ const Main = () => {
         </div>
 
         {/* the div */}
-        <div className="flex relative  rounded-2xl flex-row w-[80%] h-[80%] justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e] overflow-hidden">
+        <div className="flex relative  rounded-2xl flex-row w-[80%] h-[80%] justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e]">
           <div className="relative flex flex-col gap-y-[10px] py-[10px] w-[30%] h-full">
             <div className="bg-contain bg-no-repeat bg-center w-[80px] h-[80px] bg-[url('/deco.png')]"></div>
 
@@ -276,13 +304,24 @@ const Main = () => {
           </div>
           <div className=" bg-center bg-cover bg-no-repeat w-[70%] h-full bg-cyber-container  px-[20px] pb-[50px] flex flex-col justify-around ">
             {loaded ? (
-              <MatrixEffect
-                key={intro}
-                finalText={intro}
-                speed={30}
-                flickerspeed={20}
-                callback={doneCallback}
-              />
+              !doneL ? (
+                <div className="flex w-fit h-fit gap-y-2 flex-col items-center self-center text-center text-[#18d95f] font-glitch text-[20px]">
+                  {loadingN}
+                  <motion.div
+                  className="relative w-[100px] h-[15px] border-2 border-[#39c4b6] bg-transparent z-[1] p-[1px] overflow-hidden "
+                  >
+                    <div style= {{width: `${LoadingNumber}%`,  transition: "width 0.3s ease"  } } className=" z-[2] h-full bg-[#39c4b6]"></div>
+                  </motion.div>
+                </div>
+              ) : (
+                <MatrixEffect
+                  key={intro}
+                  finalText={intro}
+                  speed={30}
+                  flickerspeed={20}
+                  callback={doneCallback}
+                />
+              )
             ) : (
               <div className="w-full h-full flex justify-center items-center">
                 <MatrixEffect

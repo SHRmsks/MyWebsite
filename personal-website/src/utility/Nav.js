@@ -7,7 +7,7 @@ import "../app/global.css";
 
 
 
-const Nav = ({one, two, third}) => {
+const Nav = React.memo(({one, two, third}) => {
   const oneName = one.name;
   const twoName = two.name;
   const thirdName = third.name;
@@ -36,6 +36,6 @@ const Nav = ({one, two, third}) => {
         <div className="border-b-[4px] border-[#54c1e6]"></div>
       </div>
     );
-  };
+  });
   export default Nav;
   

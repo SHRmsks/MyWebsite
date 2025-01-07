@@ -42,9 +42,11 @@ const Main = () => {
   const [Glitter,setGlitter] = useState('glitter');
   useEffect(
     () => {
+      const glitterEffect = 
       setTimeout(() => {
         setGlitter('static');
       }, 3000);
+      return () => clearTimeout(glitterEffect);
     },[]
   );
   const MobileSkills = {
@@ -63,6 +65,8 @@ const Main = () => {
     managementPTS: 1,
     algoPTS: 7,
   };
+   const srcarr =['/react.svg', '/react.svg', '/react.svg']
+   const labelarr = ['react', 'react', 'react']
 
   return (
     <div className="relative h-screen  w-screen bg-[#FEE801] justify-center px-[1%] pt-[1%] m-0">
@@ -84,15 +88,17 @@ const Main = () => {
       <SkillTree  local={false} skills={Hackthon} link={'https://www.youtube.com/embed/ysVSmk_bnWM'} pjName={'Recycle Master'} framework={'React Native'} Icon={'/react.svg'} intro={'A recyclable detection mobile App that is powered with YOLO_8 in 24hrs'}/>
         */}
           <div className='w-full h-[500px] z-0'>
-        <TreeMap />
+        <TreeMap srcArr ={srcarr} labelArr={labelarr}/>
         </div>
+        <div className="bottom-0 right-0 absolute w-[20%] h-[20%] z-10 bg-black backdrop-opacity-[30px] backdrop-blur-md rounded-md">
         <motion.div 
         variants={glitter}
         initial="initial"
           animate={Glitter}
-        className="bottom-0 right-0 absolute w-fit h-fit z-20 bg-[url('/background.png')] flex justify-center bg-no-repeat bg-center items-center ">
+        className="bottom-0 right-0 absolute w-fit h-fit z-20 bg-[url('/background.png')] backdrop-blur-sm backdrop-opacity-20 rounded-md flex justify-center bg-no-repeat bg-center items-center ">
           <SkillWeb skills={skills} />
         </motion.div>
+        </div>
       </div>
     </div>
   );

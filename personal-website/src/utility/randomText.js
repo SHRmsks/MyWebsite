@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import "../app/global.css";
 import { motion } from "motion/react";
 
@@ -23,8 +23,8 @@ const MatrixEffect = ({ finalText, speed, flickerspeed, callback }) => {
       return;
     }
     const updateText = setInterval(() => {
-      const char = finalText[currentIndex];
-      const random = Array.from({ length: finalText.length }, (_, i) =>
+
+      const random = Array.from({ length: currentIndex+3}, (_, i) =>
         i < currentIndex
           ? finalText[i]
           : MatrixText[Math.floor(Math.random() * MatrixText.length)]
@@ -43,17 +43,20 @@ const MatrixEffect = ({ finalText, speed, flickerspeed, callback }) => {
     };
   }, [finalText, speed, flickerspeed, currentIndex]);
 
-  const matrix = {
+  const matrix = useMemo(()=> ({
     initial: {
       opacity: 0,
       y: -10,
     },
     matrix: {
-      opacity: [1, 0.8, 1],
+      opacity: [1, 0.9,0.8, 0.9, 1],
       y: [-3, 0, 3],
       x: [0, -1, 1],
       textShadow: [
-        "-2px 0px 5px rgba(192, 242, 237, 0.9), -2px 5px 10px rgba(95, 146, 251, 0.8)",
+        "2px 0px 2px rgba(0, 255, 0, 0.7)",
+        "-2px 0px 2px rgba(255, 0, 0, 0.7)",
+         "-2px 0px 2px rgba(0, 0, 255, 0.7)"
+        ,
       ],
       transition: {
         repeat: Infinity,
@@ -65,10 +68,10 @@ const MatrixEffect = ({ finalText, speed, flickerspeed, callback }) => {
       y: 0,
       x: 0,
       textShadow:
-        "-2px 0px 5px rgba(192, 242, 237, 0.9), -2px 5px 10px rgba(95, 146, 251, 0.8), 1px -2px 3px rgba(221, 134, 237, 0.5)",
+        "2px 0px 2px rgba(0, 255, 0, 0.5), -2px 0px 2px rgba(255, 0, 0, 0.5), -2px 0px 2px rgba(0, 0, 255, 0.5)",
       transition: { ease: "easeInOut", duration: 0.5 },
     },
-  };
+  }),[]);
 
   return (
     <motion.div
