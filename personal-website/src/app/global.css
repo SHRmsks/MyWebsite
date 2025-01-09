@@ -27,3 +27,8 @@
     font-weight: 400;
   
 }
+@font-face{
+    font-family: "introText"; 
+    src: url('/introText.ttf') format('truetype');
+    font-weight: 300;
+}

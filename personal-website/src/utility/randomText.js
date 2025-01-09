@@ -4,9 +4,9 @@ import "../app/global.css";
 import { motion } from "motion/react";
 
 const MatrixText =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?><Ξ⟟⩚⨀ʬǃ☲⫷⧖𐋅你烦我乏味啊踢人给我搞了";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?むのませおやあいきつしれりらほそひ";
 
-const MatrixEffect = ({ finalText, speed, flickerspeed, callback }) => {
+const MatrixEffect = ({ finalText, speed, flickerspeed, callback, text }) => {
   const [displayText, setDisplayText] = useState("");
   const [resolved, setResolved] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -75,12 +75,18 @@ const MatrixEffect = ({ finalText, speed, flickerspeed, callback }) => {
 
   return (
     <motion.div
-      className="text-[#39c4b6] w-fit max-w-full h-fit text-wrap break-words text-[18px] font-[400] font-text py-[15px]"
+    style={{fontFamily: text}}
+      className="text-[#39c4b6] overflow-x-hidden overflow-y-scroll w-fit max-w-full h-fit text-wrap break-words text-[18px] font-[400] py-[15px]"
       variants={matrix}
       initial="initial"
       animate={isAnimated ? "matrix" : "static"}
-    >
-      <p>{displayText}</p>
+    >{displayText.split("\n").map((line, ind) => (
+      <React.Fragment key={ind}>
+        <p>{line}</p>
+        <br />
+      </React.Fragment>
+    ))}
+     
     </motion.div>
   );
 };

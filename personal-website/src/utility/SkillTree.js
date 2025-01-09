@@ -45,9 +45,9 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
     },
   };
   useEffect(() => {
-    let LoadEffect = null; 
+    let LoadEffect = null;
     if (!load) {
-     LoadEffect = setTimeout(() => {
+      LoadEffect = setTimeout(() => {
         setLoad(true);
       }, 800);
     }
@@ -145,14 +145,14 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
           onClick={() => setTap(false)}
           className="bg-opacity-30 backdrop-blur-md bg-slate-400 flex absolute inset-0 z-10 w-full h-full justify-center items-center rounded-sm"
         >
-          <motion.div className="w-[80%] flex justify-center items-center h-[80%] z-20 rounded-md overflow-hidden">
+          <motion.div className="w-full flex justify-center items-center h-full z-20 rounded-md overflow-hidden">
             {isPreview && local && (
               <motion.video
                 src={pjLink}
                 autoPlay
                 autoFocus
                 controls
-                className="w-[90%] h-[90%] py-1 object-contain"
+                className="w-full h-full py-1 object-contain"
                 variants={VideoAnimation}
                 initial="initial"
                 animate="animate"
@@ -160,7 +160,6 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
             )}
             {isPreview && !local && (
               <iframe
-                
                 src={pjLink}
                 title={"pjName"}
                 className="w-[90%] h-[90%] py-1 ob"

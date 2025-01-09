@@ -17,38 +17,35 @@ const skills = [
   "UI",
   "Coding",
 ];
-const vals = [8,6,5,4,4,6,5,4,7];
+const vals = [8, 6, 5, 4, 4, 6, 5, 4, 7];
 
 const glitter = {
-    initial: { opacity: 0 },
-    glitter: {
-      opacity: [0, 0.4, 0.3, 0.6, 0.4, 0.8, 1],
-      x: [0, -1, 1, -2, 2, -1, 0],
-      y: [0, -1, 1, -2, 2, -1, 0],
-      transition: {
-        duration: 1,
-        ease: "easeInOut",
-        repeat: Infinity,
-      },
+  initial: { opacity: 0 },
+  glitter: {
+    opacity: [0, 0.4, 0.3, 0.6, 0.4, 0.8, 1],
+    x: [0, -1, 1, -2, 2, -1, 0],
+    y: [0, -1, 1, -2, 2, -1, 0],
+    transition: {
+      duration: 1,
+      ease: "easeInOut",
+      repeat: Infinity,
     },
-    static: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-    },
-    transition: { duration: 0.3, ease: "easeInOut" },
-  };
+  },
+  static: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+  },
+  transition: { duration: 0.3, ease: "easeInOut" },
+};
 const Main = () => {
-  const [Glitter,setGlitter] = useState('glitter');
-  useEffect(
-    () => {
-      const glitterEffect = 
-      setTimeout(() => {
-        setGlitter('static');
-      }, 3000);
-      return () => clearTimeout(glitterEffect);
-    },[]
-  );
+  const [Glitter, setGlitter] = useState("glitter");
+  useEffect(() => {
+    const glitterEffect = setTimeout(() => {
+      setGlitter("static");
+    }, 3000);
+    return () => clearTimeout(glitterEffect);
+  }, []);
   const MobileSkills = {
     frontEndPTS: 7,
     backEndPTS: 6,
@@ -65,9 +62,30 @@ const Main = () => {
     managementPTS: 1,
     algoPTS: 7,
   };
-   const srcarr =['/react.svg', '/react.svg', '/react.svg']
-   const labelarr = ['react', 'react', 'react']
-
+  const srcarr = ["/react.svg", "/react.svg", "/react.svg"];
+  const labelarr = ["react", "react","react"];
+  const props = [
+    {},
+    {
+      local: true,
+      pjName: "Work Shift Management",
+      link: "/demo.mp4",
+      skills: MobileSkills,
+      framework: "Flutter",
+      Icon: "/flutter.svg",
+      intro: "An easy team-managemnt App that derived from website",
+    },
+    {
+      local: false,
+      skills: Hackthon,
+      link: "https://www.youtube.com/embed/ysVSmk_bnWM",
+      pjName: "Recycle Master",
+      framework: "React Native",
+      Icon: "/react.svg",
+      intro:
+        "A recyclable detection mobile App that is powered with YOLO_8 in 24hrs",
+    },
+  ];
   return (
     <div className="relative h-screen  w-screen bg-[#FEE801] justify-center px-[1%] pt-[1%] m-0">
       <div className="relative w-full h-fit max-h-[20%] flex flex-row justify-between items-center ">
@@ -87,17 +105,18 @@ const Main = () => {
       
       <SkillTree  local={false} skills={Hackthon} link={'https://www.youtube.com/embed/ysVSmk_bnWM'} pjName={'Recycle Master'} framework={'React Native'} Icon={'/react.svg'} intro={'A recyclable detection mobile App that is powered with YOLO_8 in 24hrs'}/>
         */}
-          <div className='w-full h-[500px] z-0'>
-        <TreeMap srcArr ={srcarr} labelArr={labelarr}/>
+        <div className="w-full h-[500px] z-0">
+          <TreeMap srcArr={srcarr} labelArr={labelarr} props={props}/>
         </div>
         <div className="bottom-0 right-0 absolute w-[20%] h-[20%] z-10 bg-black backdrop-opacity-[30px] backdrop-blur-md rounded-md">
-        <motion.div 
-        variants={glitter}
-        initial="initial"
-          animate={Glitter}
-        className="bottom-0 right-0 absolute w-fit h-fit z-20 bg-[url('/background.png')] backdrop-blur-sm backdrop-opacity-20 rounded-md flex justify-center bg-no-repeat bg-center items-center ">
-          <SkillWeb skills={skills} />
-        </motion.div>
+          <motion.div
+            variants={glitter}
+            initial="initial"
+            animate={Glitter}
+            className="bottom-0 right-0 absolute w-fit h-fit z-20 bg-[url('/background.png')] backdrop-blur-sm backdrop-opacity-20 rounded-md flex justify-center bg-no-repeat bg-center items-center "
+          >
+            <SkillWeb skills={skills} />
+          </motion.div>
         </div>
       </div>
     </div>

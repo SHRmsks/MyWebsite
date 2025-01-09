@@ -41,7 +41,7 @@ export default {
         "xxxl-dpr-3": {raw: `(min-width: 2560px) and  (min-device-pixel-ratio: 3),  (min-width: 2560px) and (-webkit-min-device-pixel-ratio: 3)`},
 
       },
-      fontFamily: { cyberpunk: "cyberpunk", slant: "slant", text: "text", glitch: "glitch"},
+      fontFamily: { cyberpunk: "cyberpunk", slant: "slant", text: "text", glitch: "glitch", introText: "introText"},
       backgroundImage: {
         "cyber-container": "url('/CyberDiv.png')",
         "map": "url('/map.jpg')",

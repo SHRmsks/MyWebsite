@@ -168,25 +168,21 @@ const Main = () => {
     loadingNumberHandler();
   }; // callback for the loaded state
 
-
-
   const loadingNumberHandler = () => {
-    if(!doneL){
-      const interval = setInterval(() =>{
-        setLoadingNumber((prev)=> {
-          if (prev<100){
-            return prev+1
+    if (!doneL) {
+      const interval = setInterval(() => {
+        setLoadingNumber((prev) => {
+          if (prev < 100) {
+            return prev + 1;
+          } else {
+            clearInterval(interval);
+            setTimeout(() => setDoneL(true), 2000);
+            return prev;
           }
-          else{
-            clearInterval(interval); 
-           setTimeout(()=> setDoneL(true), 2000); 
-           return prev
-          }
-        })
-      }, 50)
+        });
+      }, 50);
     }
-  }
-
+  };
 
   const doneCallback = () => {
     setDone(true);
@@ -291,12 +287,14 @@ const Main = () => {
             <MatrixEffect
               finalText={IP ? `IP detected: ${IP}` : ""}
               speed={50}
+              text={"text"}
               flickerspeed={30}
             ></MatrixEffect>
 
             <MatrixEffect
               finalText={IP ? `OS detected: ${os}` : ""}
               speed={50}
+              text={"text"}
               flickerspeed={30}
             ></MatrixEffect>
 
@@ -307,10 +305,14 @@ const Main = () => {
               !doneL ? (
                 <div className="flex w-fit h-fit gap-y-2 flex-col items-center self-center text-center text-[#18d95f] font-glitch text-[20px]">
                   {loadingN}
-                  <motion.div
-                  className="relative w-[100px] h-[15px] border-2 border-[#39c4b6] bg-transparent z-[1] p-[1px] overflow-hidden "
-                  >
-                    <div style= {{width: `${LoadingNumber}%`,  transition: "width 0.3s ease"  } } className=" z-[2] h-full bg-[#39c4b6]"></div>
+                  <motion.div className="relative w-[200px] h-[15px] border-2 border-[#39c4b6] bg-transparent z-[1] p-[1px] overflow-hidden ">
+                    <div
+                      style={{
+                        width: `${LoadingNumber}%`,
+                        transition: "width 0.3s ease",
+                      }}
+                      className=" z-[2] h-full bg-[#39c4b6]"
+                    ></div>
                   </motion.div>
                 </div>
               ) : (
@@ -318,6 +320,7 @@ const Main = () => {
                   key={intro}
                   finalText={intro}
                   speed={30}
+                  text={"text"}
                   flickerspeed={20}
                   callback={doneCallback}
                 />
@@ -326,6 +329,7 @@ const Main = () => {
               <div className="w-full h-full flex justify-center items-center">
                 <MatrixEffect
                   key={loadingT}
+                  text={"text"}
                   finalText={loadingT}
                   speed={30}
                   flickerspeed={20}
@@ -341,7 +345,7 @@ const Main = () => {
                   initial="initial"
                   animate="shard"
                   onAnimationComplete={() =>
-                    setTimeout(() => setShaking(true), 100)
+                  setTimeout(() => setShaking(true), 100)
                   }
                 >
                   <motion.div
