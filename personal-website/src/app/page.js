@@ -1,6 +1,6 @@
 "use client";
 import Nav from "@/utility/Nav.js";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo} from "react";
 import { motion } from "motion/react";
 import MatrixEffect from "@/utility/randomText.js";
 import * as THREE from "three";
@@ -140,6 +140,9 @@ const Main = () => {
   const [Glitter, setGlitter] = useState("glitter");
   const [LoadingNumber, setLoadingNumber] = useState(-1);
   const [doneL, setDoneL] = useState(false);
+  const one = useMemo (()=> ({ name: "Projects", link: "./Projects" }),[])
+  const two = useMemo(()=>({ name: "About Me", link: "./About" }),[]);
+  const three = useMemo(()=>({ name: "Contact", link: "./Contact" }),[]);
   useEffect(() => {
     const controller = new AbortController();
     // console.log("DPR" + window.devicePixelRatio);
@@ -273,9 +276,9 @@ const Main = () => {
           </h1>
 
           <Nav
-            one={{ name: "Projects", link: "./Projects" }}
-            two={{ name: "About Me", link: "./About" }}
-            third={{ name: "Contact", link: "./Contact" }}
+            one={one}
+            two={two}
+            third={three}
           />
         </div>
 

@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "../app/global.css";
 import { motion } from "motion/react";
 import Text from "./text";
-const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
+const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro, state }) => {
   const [ratio, setRatio] = useState(null);
   const [ratio2, setRatio2] = useState(null);
 
@@ -25,8 +25,11 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
   const [load, setLoad] = useState(false);
   const glitter = {
     initial: {
-      opacity: 0,
-      x: 0,
+     opacity: 1, 
+     scale: 1,
+     x: 0,
+     y: 0,
+      
     },
     glitter: {
       opacity: [0.1, 0.3, 0.5, 0.5, 0.7, 0.8],
@@ -51,7 +54,10 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
         setLoad(true);
       }, 800);
     }
-    if (LoadEffect) clearTimeout(LoadEffect);
+    return () => {
+      clearTimeout(LoadEffect);
+   
+    };
   }, [load]);
 
   const [tap, setTap] = useState(false);
@@ -80,6 +86,13 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
   // const HoverHandler = ()=> {
 
   // }
+  const [hover, setHover] = useState(false);
+  const animationState = useMemo(() => {
+    if (tap) return "exit"; 
+    if (hover) return "glitter"; 
+    return load ? "exit" : "initial"; 
+  }, [hover, tap, load]);
+
   useEffect(() => {
     if (tap) {
       window.addEventListener("keydown", keydownHandler);
@@ -88,13 +101,13 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
       window.removeEventListener("keydown", keydownHandler);
     };
   }, [tap]);
-  const frontEndPTS = skills.frontEndPTS || 0;
+  const frontEndPTS =useMemo(()=>  skills.frontEndPTS || 0,[]);
   const backEndPTS = skills.backEndPTS || 0;
   const databasePTS = skills.databasePTS || 0;
   const designPTS = skills.designPTS || 0;
   const managementPTS = skills.managementPTS || 0;
   const AlgoPTS = skills.algoPTS || 0;
-
+   
   return (
     <>
       {ratio && (
@@ -102,12 +115,14 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
           style={{ height: ratio ? `${500 / ratio}px` : "auto" }}
           className="z-0 relative bg-[url('/skillT1.png')] flex flex-row justify-center items-start bg-no-repeat bg-contain bg-center w-[500px]  overflow-hidden"
         >
+          {console.log('load'+ load)}
           <motion.div
             variants={glitter}
             initial="initial"
-            animate={load ? "exit" : "glitter"}
-            whileHover={"glitter"}
-            onTap={Taphandler}
+            animate={animationState}
+             onMouseEnter={() => !tap && setHover(true)}
+             onMouseLeave={() => !tap && setHover(false)}
+            onClick={Taphandler}
             // onHoverStart={HoverHandler}
             // onHoverEnd={EndHandler}
             className="flex flex-row justify-center items-center w-[60%] h-[90%]  "
@@ -173,7 +188,7 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
     </>
   );
 };
-const SkillTree = ({ link, skills, framework, Icon, intro, pjName, local }) => {
+const SkillTree = ({ link, skills, framework, Icon, intro, pjName, local, state }) => {
   return (
     <SKdiv
       local={local}
