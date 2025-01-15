@@ -18,12 +18,12 @@ const Main = () => {
   );
   const [ratio, setRatio] = useState(null);
   const [width, setWidth] = useState(null);
-  const [hover, setHover] = useState(null);
+
   const imgRef = useRef(null); // div Ref for loading image
 
   const one = useMemo(() => ({ name: "Home", link: "../" }), []);
   const two = useMemo(() => ({ name: "Projects", link: "/Projects" }), []);
-  const three = useMemo(() => ({ name: "About me", link: "/About" }), []); // useMemo for the Nav component
+  const three = useMemo(() => ({ name: "Contact", link: "/Contact" }), []); // useMemo for the Nav component
 
   const imageSizeHandler = useCallback(() => {
     if (imgRef.current) {

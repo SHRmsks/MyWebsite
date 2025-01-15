@@ -202,7 +202,7 @@ const TreeMap = ({ srcArr, labelArr, props }) => {
         ></ReactFlow>
         {selectedSkillTreeProps && (
           <div
-            className="absolute inset-0 w-full h-full z-30 flex justify-center items-center bg-black bg-opacity-80"
+            className="absolute inset-0 w-full h-full z-30 flex justify-center items-center bg-black bg-opacity-60"
             onClick={closeOverlay}
           >
             <div

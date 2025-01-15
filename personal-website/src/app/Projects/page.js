@@ -53,8 +53,8 @@ const Main = () => {
   );
   const [Glitter, setGlitter] = useState("glitter");
   const one = useMemo(() => ({ name: "Home", link: "../" }), []);
-  const two = useMemo(() => ({ name: "Projects", link: "/Projects" }), []);
-  const three = useMemo(() => ({ name: "About Me", link: "/About" }), []);
+  const two = useMemo(() => ({ name:  "About Me", link: "/About" }), []);
+  const three = useMemo(() => ({ name: "Contact", link: "/Contact" }), []);
 
   useEffect(() => {
     const glitterEffect = setTimeout(() => {
@@ -140,10 +140,10 @@ const Main = () => {
 
       <div
         ref={parentRef}
-        className="bg-[url('/background.png')] relative bg-cover h-[90%] overflow-auto flex-grow w-full bg-no-repeat rounded-lg bg-center  px-[5px] py-[8px] flex flex-col justify-between gap-y-[10px]"
+        className="bg-[url('/background.png')] relative bg-cover h-[90%] overflow-auto flex-1 w-full bg-no-repeat rounded-lg bg-center  px-[5px] py-[8px] flex flex-col justify-between gap-y-[10px]"
       >
         {isReady && (
-          <div style={{ height: `${height * 0.8}px` }} className="w-full z-0">
+          <div style={{ height: `${height}px` }} className="w-full z-0">
             <TreeMap srcArr={srcarr} labelArr={labelarr} props={props} />
           </div>
         )}

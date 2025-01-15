@@ -1,6 +1,12 @@
 "use client";
 import Nav from "@/utility/Nav.js";
-import React, { useEffect, useState, useRef, useMemo} from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { motion } from "motion/react";
 import MatrixEffect from "@/utility/randomText.js";
 import * as THREE from "three";
@@ -8,10 +14,12 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
-// import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const Scene = () => {
   const ref = useRef(null);
+
   useEffect(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -53,13 +61,21 @@ const Scene = () => {
       scene,
       camera
     );
-    outlinePass.edgeStrength = 0.4;
-    outlinePass.edgeGlow = 0.5;
+    outlinePass.edgeStrength = 0.34;
+    outlinePass.edgeGlow = 0.35;
     outlinePass.edgeThickness = 0.1;
     outlinePass.visibleEdgeColor.set(0x5ef6ef);
     composer.addPass(outlinePass);
+    const outputPass = new OutputPass();
+    composer.addPass(outputPass);
 
     const loader = new GLTFLoader();
+
+    camera.position.z = 4;
+    camera.position.y = 5;
+
+    camera.lookAt(0, 2, 0);
+
     let model;
     loader.load(
       "/globe.glb",
@@ -74,31 +90,38 @@ const Scene = () => {
 
         model.position.y += model.position.y - center.y;
         model.position.z += model.position.z - center.z;
-
-        camera.position.z = 4;
-        camera.position.y = 5; // controls the height of the camera
-        camera.lookAt(0, 2, 0);
-
-        if (model) {
-          model.traverse((child) => {
-            if (child.isMesh) {
-              console.log("Is Mesh");
-            } else {
-              console.log("Not Mesh" + child.name + child.type);
-            }
-            // console.log("Properties:", Object.keys(child));
-          });
-        }
       },
       undefined,
       (err) => {
         console.error(err);
       }
     );
+    let isDragging = false;
+    let previous = { x: 0, y: 0 };
+    const onMouseDown = (e) => {
+      isDragging = true;
+      previous = { x: e.clientX, y: e.clientY };
+    };
+    const onMouseMove = (e) => {
+      if (isDragging && model) {
+        const dx = e.clientX - previous.x;
+        const dy = e.clientY - previous.y;
+        model.rotation.y += dx * 0.01;
+        model.rotation.x += dy * 0.01;
+        previous = { x: e.clientX, y: e.clientY };
+      }
+    };
+    const onMouseUp = () => {
+      isDragging = false;
+    };
+    renderer.domElement.addEventListener("mousedown", onMouseDown);
+    renderer.domElement.addEventListener("mouseup", onMouseUp);
+    renderer.domElement.addEventListener("mousemove", onMouseMove);
 
     const animate = () => {
       if (model) {
         model.rotation.y += 0.005;
+        // controller.update()
       }
 
       composer.render();
@@ -117,6 +140,10 @@ const Scene = () => {
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("mousemove", onMouseMove);
+
       if (ref.current) {
         ref.current.removeChild(renderer.domElement);
       }
@@ -140,13 +167,17 @@ const Main = () => {
   const [Glitter, setGlitter] = useState("glitter");
   const [LoadingNumber, setLoadingNumber] = useState(-1);
   const [doneL, setDoneL] = useState(false);
-  const one = useMemo (()=> ({ name: "Projects", link: "./Projects" }),[])
-  const two = useMemo(()=>({ name: "About Me", link: "./About" }),[]);
-  const three = useMemo(()=>({ name: "Contact", link: "./Contact" }),[]);
+  const one = useMemo(() => ({ name: "Projects", link: "./Projects" }), []);
+  const two = useMemo(() => ({ name: "About Me", link: "./About" }), []);
+  const three = useMemo(() => ({ name: "Contact", link: "./Contact" }), []);
+  const [svgContent, setSvgContent] = useState(null);
+
+  const [loaded, setLoaded] = useState(false);
+  const [done, setDone] = useState(false);
+
   useEffect(() => {
     const controller = new AbortController();
-    // console.log("DPR" + window.devicePixelRatio);
-    // console.log(window.innerWidth);
+
     fetch("/api/ip")
       .then((res) => res.json())
       .then((data) => {
@@ -154,17 +185,52 @@ const Main = () => {
         setOS(data.os);
       })
       .catch((err) => console.error(err));
+
+    fetch("/world.svg")
+      .then((response) => response.text())
+      .then((data) => {
+        let replaced = data
+          .replace(/width="[\d.]+"/, `width="100%"`)
+          .replace(/height="[\d.]+"/, `height="100%"`)
+          .replace(
+            /<svg/,
+            `<svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 1009.6727 665.96301"`
+          );
+        replaced = replaced.replace(
+          /(<path[^>]*\sid=["']CN["'][^>]*)(\/>)/i,
+          `$1 style="transform-box: fill-box; transform-origin: center;">
+  <animate
+    attributeName="fill"
+    values="#5ecaeb;#020230;#5ecaeb"
+    dur="2s"
+    repeatCount="indefinite"
+  />
+  <animateTransform
+    attributeName="transform"
+    attributeType="XML"
+    type="scale"
+    values="1;1.1;1"
+    dur="2s"
+    additive="replace"
+    repeatCount="indefinite"
+  />
+  </path>`
+        );
+        console.log("replaced" + replaced);
+        setSvgContent(replaced);
+      })
+      .catch((error) => console.error("Error loading SVG:", error));
+    console.log(svgContent);
     return () => controller.abort();
   }, []);
 
-  const loadingT = "Hacking in ...";
+  const loadingT = useMemo(() => "Hacking in ...", []);
   const loadingN = `Data Breaching: ${LoadingNumber}%`;
 
-  const intro =
-    // "I am a studying Maths and Computer Science at Boston University. I have learned the intermediated level of Python, Java, and the basic knowledge of FrontEnd. I am currently a a member of BUCSSA(Boston University Chinese Student Scholar Association) Technological Department, and my job is building web pages and illustrating effects. I am also very thrilled about all the connections to BackEnd, especially building a database with vector search. Feel free to contact me!";
-    "fs";
-  const [loaded, setLoaded] = useState(false);
-  const [done, setDone] = useState(false);
+  const intro = useMemo(
+    () => "Target has been initialized\n\nSearching the Map... ",
+    []
+  );
 
   const loadedCallback = () => {
     setLoaded(true);
@@ -191,60 +257,69 @@ const Main = () => {
     setDone(true);
   };
 
-  const Sharding = {
-    initial: { clipPath: "polygon(0 0, 0 0, 0 0, 0 0 )" },
-    shard: {
-      clipPath: [
-        "polygon(0 0, 0 0, 0 0, 0 0)",
-        "polygon(0 0, 50% 0, 0 50%, 0 50%)",
-        "polygon(0 0, 100% 0, 0% 100%, 0 100%)",
-        // "polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 0)",
-        "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-      ],
-      x: [0, 5, -5, 5, 0],
-      y: [0, 5, -5, 5, 0],
-      z: [0, 0, 0, 0, 0],
-      transition: { duration: 0.8, ease: "easeInOut" },
-    },
-  };
-  const glitter = {
-    initial: { opacity: 0 },
-    glitter: {
-      opacity: [0, 0.3, 0.2, 0.5, 0.3, 0.8, 1],
-      x: [0, -1, 1, -2, 2, -1, 0],
-      y: [0, -1, 1, -2, 2, -1, 0],
-      transition: {
-        duration: 1,
-        ease: "easeInOut",
-        repeat: Infinity,
+  const Sharding = useMemo(
+    () => ({
+      initial: { clipPath: "polygon(0 0, 0 0, 0 0, 0 0 )" },
+      shard: {
+        clipPath: [
+          "polygon(0 0, 0 0, 0 0, 0 0)",
+          "polygon(0 0, 50% 0, 0 50%, 0 50%)",
+          "polygon(0 0, 100% 0, 0% 100%, 0 100%)",
+          // "polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 0)",
+          "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+        ],
+        x: [0, 5, -5, 5, 0],
+        y: [0, 5, -5, 5, 0],
+        z: [0, 0, 0, 0, 0],
+        transition: { duration: 0.8, ease: "easeInOut" },
       },
-    },
-    static: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-    },
-    transition: { duration: 0.3, ease: "easeInOut" },
-  };
+    }),
+    []
+  );
+  const glitter = useMemo(
+    () => ({
+      initial: { opacity: 0 },
+      glitter: {
+        opacity: [0, 0.3, 0.2, 0.5, 0.3, 0.8, 1],
+        x: [0, -1, 1, -2, 2, -1, 0],
+        y: [0, -1, 1, -2, 2, -1, 0],
+        transition: {
+          duration: 1,
+          ease: "easeInOut",
+          repeat: Infinity,
+        },
+      },
+      static: {
+        opacity: 1,
+        x: 0,
+        y: 0,
+      },
+      transition: { duration: 0.3, ease: "easeInOut" },
+    }),
+    []
+  );
 
-  const shakeVariants = {
-    idle: {
-      x: 0,
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-    shake: {
-      opacity: [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
-      x: [0, -1, 1, -2, 2, -1, 0],
-      y: [0, -1, 1, -2, 2, -1, 0],
-      transition: {
-        duration: 0.6,
-        ease: "easeInOut",
-        repeat: Infinity,
+  const shakeVariants = useMemo(
+    () => ({
+      idle: {
+        x: 0,
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.5, ease: "easeInOut" },
       },
-    },
-  };
+      shake: {
+        opacity: [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
+        x: [0, -1, 1, -2, 2, -1, 0],
+        y: [0, -1, 1, -2, 2, -1, 0],
+        transition: {
+          duration: 0.6,
+          ease: "easeInOut",
+          repeat: Infinity,
+        },
+      },
+    }),
+    []
+  );
 
   useEffect(() => {
     let glitterTimeout = null;
@@ -268,22 +343,18 @@ const Main = () => {
   }, [hover, shaking, doneL]);
 
   return (
-    <div className="relative h-screen w-screen bg-[#FEE801] justify-center px-[1%] py-[1%]">
+    <div className="relative h-screen w-screen bg-[#FEE801] overflow-auto justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
         <div className="relative w-full h-fit flex flex-row justify-between items-center ">
           <h1 className="text-[#00060e] font-bold font-slant sm-dpr-1:text-[30px] sm-dpr-2:text-[20px] sm-dpr-3:text-[15px] md-dpr-1:text-[50px] md-dpr-2:text-[40px] md-dpr-3:text-[30px] lg-dpr-1:text-[60px] lg-dpr-2:text-[40px] lg-dpr-3:text-[30px] xl-dpr-1:text-[60px] xl-dpr-2:text-[40px] xl-dpr-3:text-[30px] xxl-dpr-1:text-[60px] xxl-dpr-2:text-[50px] xxl-dpr-3:text-[40px] xxxl-dpr-1:text-[60px] xxxl-dpr-2:text-[50px] xxxl-dpr-3:text-[40px]">
             Welcome to Haoran's Website
           </h1>
 
-          <Nav
-            one={one}
-            two={two}
-            third={three}
-          />
+          <Nav one={one} two={two} third={three} />
         </div>
 
         {/* the div */}
-        <div className="flex relative  rounded-2xl flex-row w-[80%] h-[80%] justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e]">
+        <div className="flex relative  rounded-2xl flex-row w-full h-full flex-1 overflow-auto justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e]">
           <div className="relative flex flex-col gap-y-[10px] py-[10px] w-[30%] h-full">
             <div className="bg-contain bg-no-repeat bg-center w-[80px] h-[80px] bg-[url('/deco.png')]"></div>
 
@@ -348,17 +419,24 @@ const Main = () => {
                   initial="initial"
                   animate="shard"
                   onAnimationComplete={() =>
-                  setTimeout(() => setShaking(true), 100)
+                    setTimeout(() => setShaking(true), 100)
                   }
                 >
                   <motion.div
                     onMouseEnter={() => setHover(true)}
                     onMouseLeave={() => setHover(false)}
-                    className="relative z-[5] w-[60%] aspect-[16/9] bg-map
+                    className="relative z-[5] w-[60%]
          bg-contain bg-center bg-no-repeat rounded-[10px] border border-blue-500  shadow-bottom"
                     variants={shakeVariants}
                     animate={shaking ? "shake" : "idle"}
-                  ></motion.div>
+                  >
+                    {svgContent && (
+                      <div
+                        className="overflow-auto overflow-x-auto flex-1 justify-center items-center"
+                        dangerouslySetInnerHTML={{ __html: svgContent }}
+                      />
+                    )}
+                  </motion.div>
                 </motion.div>
                 {hover && (
                   <motion.div
