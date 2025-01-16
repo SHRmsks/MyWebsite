@@ -167,7 +167,7 @@ const Main = () => {
   const [isFinished, setIsFinished]= useState(false);
   const [loaded, setLoaded] = useState(false);
   const [done, setDone] = useState(false);
-
+  const [initial, setInitial] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
 
@@ -337,6 +337,8 @@ const Main = () => {
   }, [hover, shaking, doneL]);
 
   return (
+    initial? <Game/>: 
+
     <div className="relative h-screen w-screen bg-[#FEE801] overflow-auto justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
         <div className="relative w-full h-fit flex flex-row justify-between items-center ">

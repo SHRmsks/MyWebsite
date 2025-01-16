@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import Nav from "@/utility/Nav.js";
 import { motion } from "motion/react";
-
+import Link from "@/utility/contact.js";
 const Main = () => {
   const one = useMemo(() => ({ name: "Home", link: "../" }), []);
   const two = useMemo(() => ({ name: "Projects", link: "../Projects " }), []);
@@ -21,7 +21,7 @@ const Main = () => {
       </div >
         <div className="overflow-auto flex-1 bg-[url('/background.png')] w-full h-full justify-center items-start py-[20px] px-[10px] rounded-2xl flex-row ">
 
-
+          <Link name="Github" link ="https://github.com/SHRmsks" icon="github.svg"/>
         </div>
 
 
