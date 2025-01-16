@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import "../app/global.css";
 import { motion } from "motion/react";
 import Text from "./text";
-const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro, state }) => {
+const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro }) => {
   const [ratio, setRatio] = useState(null);
   const [ratio2, setRatio2] = useState(null);
 
@@ -83,9 +83,6 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro, state })
       setTap(false);
     }
   };
-  // const HoverHandler = ()=> {
-
-  // }
   const [hover, setHover] = useState(false);
   const animationState = useMemo(() => {
     if (tap) return "exit"; 
@@ -123,8 +120,6 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro, state })
              onMouseEnter={() => !tap && setHover(true)}
              onMouseLeave={() => !tap && setHover(false)}
             onClick={Taphandler}
-            // onHoverStart={HoverHandler}
-            // onHoverEnd={EndHandler}
             className="flex flex-row justify-center items-center w-[60%] h-[90%]  "
           >
             <div className="relative w-[90%] h-[90%] flex flex-col justify-center items-center">
@@ -188,7 +183,7 @@ const SKdiv = ({ local, pjName, pjLink, skills, framework, Icon, intro, state })
     </>
   );
 };
-const SkillTree = ({ link, skills, framework, Icon, intro, pjName, local, state }) => {
+const SkillTree = ({ link, skills, framework, Icon, intro, pjName, local }) => {
   return (
     <SKdiv
       local={local}

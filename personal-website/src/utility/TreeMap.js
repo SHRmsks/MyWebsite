@@ -25,15 +25,17 @@ const customNode = ({ data }) => {
 
   return (
     <div
-      className="text-center rounded-sm h-fit w-fit cursor-pointer"
+      className="text-center rounded-sm h-fit w-fit cursor-pointer hover:scale-[1.2] ease-in-out duration-200"
       onClick={ClickHandler}
+   
     >
       <Handle
         type="source"
         position="bottom"
         style={{ visibility: "hidden" }}
       />
-      <Handle type="target" position="right" style={{ visibility: "hidden" }} />
+      {data.pos && data.pos == "left"?  <Handle type="target" position="left" style={{ visibility: "hidden" }} />: 
+      <Handle type="target" position="right" style={{ visibility: "hidden" }} />}
 
       <>
         <img
@@ -74,15 +76,27 @@ const CustomEdges = ({ sourceX, sourceY, targetX, targetY }) => {
       <g>
         <BaseEdge
           path={edgePath}
-          style={{ stroke: "#54c1e6", strokeWidth: 10 }}
+          style={{ stroke: "#dead26", strokeWidth: 10 }}
         />
         <path
           d={edgePath}
           stroke="#36576e"
           strokeWidth="4"
+          strokeDasharray="10,2,2 , 4"
           filter="url(#glow)"
           fill="none"
         />
+        <path
+          d= {edgePath}
+          stroke="#36576e"
+          strokeWidth="1"
+          strokeDasharray="6,7,3,1"
+          filter="url(#glow)"
+            fill="none"
+        />
+
+
+    
       </g>
       <circle r="6" fill="url(#gradient)" filter="url(#glow)">
         <animateMotion
@@ -129,11 +143,13 @@ const TreeMap = ({ srcArr, labelArr, props }) => {
 
         let distanceX = offsetWidth / (srcArr.length - 2) - 100 * number; // single row
         let distanceY = offsetHeight / 4 - 10;
+        let pos = 'right'
 
         if (srcArr.length > 4) {
           number = Math.ceil((srcArr.length - 1) / 2);
           distanceX = offsetWidth / (srcArr.length - 2) - 100 * number;
         }
+       
         let nodes = [
           {
             id: "root",
@@ -158,11 +174,14 @@ const TreeMap = ({ srcArr, labelArr, props }) => {
             xv = (ind - number) * distanceX;
             yv = distanceY + distancey;
           }
+          if (xv >  distancex/2 ) pos = 'left';
+          console.log (ind, xv)
           nodes.push({
             id: `child${ind}`,
             type: "img",
             position: { x: xv, y: yv },
             data: {
+              pos: pos,
               src: val,
               label: childlabel,
               onShowSkillTree: (props) => {

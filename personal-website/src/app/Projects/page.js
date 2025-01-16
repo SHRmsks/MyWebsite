@@ -85,7 +85,7 @@ const Main = () => {
     []
   );
 
-  const srcarr = useMemo(() => ["/react.svg", "/react.svg", "/react.svg"], []);
+  const srcarr = useMemo(() => ["/skill1.png", "/skill2.png", "/skill3.png"], []);
   const labelarr = useMemo(() => ["Skill Tree", "react", "react"], []);
   const props = useMemo(
     () => [
@@ -118,7 +118,7 @@ const Main = () => {
 
   const update = useCallback(() => {
     if (parentRef.current) {
-      // console.log('parent '+ parentRef.current.offsetHeight )
+     
       setHeight(parentRef.current.offsetHeight);
       setIsReady(true);
     }

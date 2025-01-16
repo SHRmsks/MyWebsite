@@ -1,12 +1,6 @@
 "use client";
 import Nav from "@/utility/Nav.js";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { motion } from "motion/react";
 import MatrixEffect from "@/utility/randomText.js";
 import * as THREE from "three";
@@ -15,7 +9,6 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const Scene = () => {
   const ref = useRef(null);
@@ -171,7 +164,7 @@ const Main = () => {
   const two = useMemo(() => ({ name: "About Me", link: "./About" }), []);
   const three = useMemo(() => ({ name: "Contact", link: "./Contact" }), []);
   const [svgContent, setSvgContent] = useState(null);
-
+  const [isFinished, setIsFinished]= useState(false);
   const [loaded, setLoaded] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -206,7 +199,7 @@ const Main = () => {
     repeatCount="indefinite"
   />
   <animateTransform
-    attributeName="transform"
+    attributeName="transform"w
     attributeType="XML"
     type="scale"
     values="1;1.1;1"
@@ -226,7 +219,7 @@ const Main = () => {
 
   const loadingT = useMemo(() => "Hacking in ...", []);
   const loadingN = `Data Breaching: ${LoadingNumber}%`;
-
+  const finishedText = useMemo(() =>"Target position is located...", []);
   const intro = useMemo(
     () => "Target has been initialized\n\nSearching the Map... ",
     []
@@ -255,6 +248,7 @@ const Main = () => {
 
   const doneCallback = () => {
     setDone(true);
+    setIsFinished(true);
   };
 
   const Sharding = useMemo(
@@ -389,7 +383,20 @@ const Main = () => {
                     ></div>
                   </motion.div>
                 </div>
-              ) : (
+              ) : 
+                isFinished? (
+                  <MatrixEffect
+                  key={finishedText}
+                  finalText={finishedText}
+                  speed={30}
+                  text={"text"}
+                  flickerspeed={20}
+                 
+                />
+                ):
+              
+              
+              (
                 <MatrixEffect
                   key={intro}
                   finalText={intro}
@@ -399,6 +406,10 @@ const Main = () => {
                   callback={doneCallback}
                 />
               )
+
+
+
+
             ) : (
               <div className="w-full h-full flex justify-center items-center">
                 <MatrixEffect
@@ -429,6 +440,7 @@ const Main = () => {
          bg-contain bg-center bg-no-repeat rounded-[10px] border border-blue-500  shadow-bottom"
                     variants={shakeVariants}
                     animate={shaking ? "shake" : "idle"}
+                   
                   >
                     {svgContent && (
                       <div
@@ -441,7 +453,7 @@ const Main = () => {
                 {hover && (
                   <motion.div
                     key={Glitter}
-                    className=" absolute flex flex-col justify-center gap-y-4 items-center text-start text- top-0 right-[2px] bg-[url('/Card.png')] bg-no-repeat bg-cover bg-center w-[30%] min-w-[200px] h-full z-10"
+                    className=" absolute flex flex-col justify-center py-4 gap-y-4 items-center text-start top-0 right-[2px] bg-[url('/Card.png')] bg-no-repeat bg-cover bg-center w-[30%] min-w-[200px] h-full z-10"
                     variants={glitter}
                     initial="initial"
                     animate={Glitter}
@@ -450,7 +462,7 @@ const Main = () => {
                       {" "}
                       Info detected: <br />
                     </p>
-                    <p className="text-[12px] font-text text-[#39c4b6] text-wrap break-words ">
+                    <p className="text-[12px] font-text text-[#39c4b6] text-wrap break-words flex-col ">
                       Name: Haoran <br />
                       Age: 21 <br />
                       Gender: Male <br />
