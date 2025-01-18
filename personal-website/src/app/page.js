@@ -9,7 +9,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
-
+import Room from "@/utility/game.js";
 const Scene = () => {
   const ref = useRef(null);
 
@@ -142,6 +142,7 @@ const Scene = () => {
       }
 
       renderer.dispose();
+      camera.dispose();
     };
   }, []);
   return (
@@ -167,7 +168,7 @@ const Main = () => {
   const [isFinished, setIsFinished]= useState(false);
   const [loaded, setLoaded] = useState(false);
   const [done, setDone] = useState(false);
-  const [initial, setInitial] = useState(false);
+  const [initial, setInitial] = useState(true);
   useEffect(() => {
     const controller = new AbortController();
 
@@ -337,7 +338,7 @@ const Main = () => {
   }, [hover, shaking, doneL]);
 
   return (
-    initial? <Game/>: 
+    initial? <Room />: 
 
     <div className="relative h-screen w-screen bg-[#FEE801] overflow-auto justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
