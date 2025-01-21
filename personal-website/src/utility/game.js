@@ -10,8 +10,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 const Room = () => {
   const gameRef = useRef(null);
+  const minY = useRef(null);
   const [locked, setLocked] = useState(false);
-
+  const cameraRef = useRef(null);
+  const cameraOffset = useRef();
   useEffect(() => {
     const world = new Cannon.World({
       gravity: new Cannon.Vec3(0, -9.81, 0),
@@ -19,6 +21,7 @@ const Room = () => {
 
     const body = new Cannon.Body({
       mass: 20,
+      type: Cannon.BODY_TYPES.DYNAMIC,
     });
 
     const scene = new THREE.Scene();
@@ -31,54 +34,106 @@ const Room = () => {
 
     let model;
     let char; // the character
-
+    let boxLength;
+    let boxWidth;
     const loader = new GLTFLoader();
     const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 10, 5);
     scene.add(directionalLight);
-    loader.load(
-      "/cyberpunkRoom.glb",
-      (gltf) => {
-        model = gltf.scene;
-        const boxBounds = new THREE.Box3().setFromObject(model);
 
-        scene.add(model);
-      },
-      undefined,
-      (err) => {
-        console.error(err);
-      }
-    );
-    // if (centerx && centery && centerz) {
-    loader.load(
-      "/human.glb",
-      (gltf) => {
-        char = gltf.scene;
+    const LoadRoom = () =>
+      new Promise((resolve, reject) => {
+        loader.load(
+          "/cyberpunkRoom.glb",
+          (gltf) => {
+            model = gltf.scene;
+            const boxBounds = new THREE.Box3().setFromObject(model);
+            const size = new THREE.Vector3();
+            minY.current = boxBounds.min.y;
+            // console.log("building min: " + minY.current);
+            boxBounds.getSize(size);
+            boxWidth = size.x;
+            boxLength = size.z;
+            // console.log("boxWidth, boxHeight" + boxWidth + boxLength);
+            scene.add(model);
 
-        char.scale.set(0.01, 0.01, 0.01);
-        scene.add(char);
-        const boxBounds = new THREE.Box3().setFromObject(char);
-        const center = boxBounds.getCenter(new THREE.Vector3());
-        const size = boxBounds.getSize(new THREE.Vector3());
-        char.position.set(0, 0, 0);
-        body.position.set(char.position.x, char.position.y, char.position.z)
-        
+            const floor = new Cannon.Body({
+              mass: 0,
+              shape: new Cannon.Box(
+                new Cannon.Vec3(boxWidth / 2, boxLength / 2, 0.001)
+              ),
+            });
+            floor.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+            world.addBody(floor);
+            resolve();
+          },
+          undefined,
+          (err) => {
+            console.error(err);
+            reject(err);
+          }
+        );
+      });
+    const LoadChar = () =>
+      new Promise((resolve, reject) => {
+        loader.load(
+          "/human.glb",
+          (gltf) => {
+            char = gltf.scene;
 
-        const torso = new Cannon.Cylinder(size.x, size.x, 0.8 * size.y, 8);
-        const head = new Cannon.Sphere(0.8 * size.x);
-        body.addShape(torso, new Cannon.Vec3(0, 0, 0));
-        body.addShape(head, new Cannon.Vec3(0, 0.8 * size.y, 0));
-        world.addBody(body); // add the humoid body
-        console.log("Model loaded:", char);
-        camera.position.set(size.x, center.y + 0.3 * size.y, size.z);
-      },
-      undefined,
-      (err) => {
-        console.error(err);
-      }
-    );
+            char.scale.set(0.01, 0.01, 0.01);
+            char.updateWorldMatrix(true, true);
+            scene.add(char);
+            const boxBounds = new THREE.Box3().setFromObject(char);
+
+            const min = boxBounds.min;
+
+            // console.log("Test Min"+ min.y+ " "+ max.y)
+            const size = new THREE.Vector3();
+
+            const sizeCenter = new THREE.Vector3();
+            boxBounds.getCenter(sizeCenter);
+            boxBounds.getSize(size);
+
+            cameraOffset.current = sizeCenter.z + 0.2;
+
+            // console.log("half Height: "+ sizeCenter.y)
+            // console.log("height "+  size.y)
+            char.position.set(0, 0.01 + Math.abs(min.y + minY.current), 0);
+            console.log("character position " + char.position.y);
+            body.position.set(
+              char.position.x,
+              char.position.y,
+              char.position.z
+            );
+
+            const torso = new Cannon.Cylinder(size.x, size.x, 0.8 * size.y, 8);
+
+            const head = new Cannon.Sphere(0.4 * size.x);
+            body.addShape(torso, new Cannon.Vec3(0, 0, 0));
+            body.addShape(head, new Cannon.Vec3(0, 0.8 * size.y, 0));
+            world.addBody(body); // add the humoid body
+
+            // console.log("Model loaded:", char);
+            cameraRef.current = 0.7 * size.y + Math.abs(min.y + minY.current);
+            // console.log("height: " + cameraRef.current);
+            camera.position.set(size.x, cameraRef.current, size.z);
+            resolve();
+          },
+          undefined,
+          (err) => {
+            console.error(err);
+            reject(err);
+          }
+        );
+      });
+
+    LoadRoom()
+      .then(() => LoadChar())
+      .then(() => console.log("Model loaded"))
+      .catch((err) => console.error(err));
 
     const axisHelper = new THREE.AxesHelper(10);
     scene.add(axisHelper);
@@ -90,12 +145,12 @@ const Room = () => {
       gameRef.current.appendChild(renderer.domElement);
     }
 
+    const MAX_YAW = Math.PI / 4;
+    const MIN_YAW = -Math.PI / 4;
+    const MAX_PITCH = Math.PI / 6;
+    const MIN_PITCH = -Math.PI / 6;
     const controls = new PointerLockControls(camera, renderer.domElement);
-    const control = new OrbitControls(camera, renderer.domElement);
-    control.enableDamping = true;
-    control.enableDampingFactor = 0.05;
-    control.enableZoom = true;
-    control.update();
+
     let keyDowns = {};
     document.addEventListener("click", () => {
       if (locked === false) controls.lock();
@@ -105,58 +160,142 @@ const Room = () => {
         controls.unlock();
       }
 
-      keyDowns[e.key] = true;
+      keyDowns[e.key.toLowerCase()] = true;
     });
     document.addEventListener("keyup", (e) => {
-      keyDowns[e.key] = false;
+      keyDowns[e.key.toLowerCase()] = false;
     });
+
     const Action = () => {
       const speed = 1;
+      const deltaTime = 1 / 60;
+
+      // console.log("rotation: " + camera.rotation.y);
+      const forwardVector = new THREE.Vector3(0, 0, -1).applyQuaternion(
+        body.quaternion
+      );
+      const leftVector = new THREE.Vector3(1, 0, 0).applyQuaternion(
+        body.quaternion
+      );
+      leftVector.normalize();
+      forwardVector.normalize();
+
+      // let moveSpeed = new Cannon.Vec3(0, 0, 0);
+      let movePosition = new Cannon.Vec3(0, 0, 0);
       if (keyDowns["w"]) {
- 
-        const forwardVector = new Cannon.Vec3(
-          Math.sin(camera.rotation.y),
-          0,
-          -Math.cos(camera.rotation.y)
+        // body.applyImpulse(forwardVector.scale(speed), body.position);
+        movePosition = movePosition.vadd(
+          forwardVector.multiplyScalar(speed * deltaTime)
         );
-        forwardVector.normalize();
-       forwardVector.scale(speed);
-
-       console.log("Moving forward:", forwardVector);
-        body.velocity.set(forwardVector.x, body.velocity.y, forwardVector.z);
-        console.log("Body velocity:", body.velocity);
-
+        // moveSpeed = moveSpeed.vadd(forwardVector.scale(speed));
+        // console.log("Body velocity:", body.velocity);
       }
+      if (keyDowns["s"]) {
+        movePosition = movePosition.vadd(
+          forwardVector.multiplyScalar(-speed * deltaTime)
+        );
+        // body.applyImpulse(forwardVector.scale(-speed), body.position);
+        // moveSpeed = moveSpeed.vadd(forwardVector.scale(-speed));
+      }
+      if (keyDowns["a"]) {
+        movePosition = movePosition.vadd(
+          leftVector.multiplyScalar(-speed * deltaTime)
+        );
+        //  moveSpeed = moveSpeed.vadd(rightVector.scale(-speed));
+      }
+
+      if (keyDowns["d"]) {
+        movePosition = movePosition.vadd(
+          leftVector.multiplyScalar(speed * deltaTime)
+        );
+
+        // moveSpeed = moveSpeed.vadd(rightVector.scale(speed)
+
+        // );
+      }
+      body.angularFactor.set(0, 1, 0);
+
+      body.position.set(
+        body.position.x + movePosition.x,
+        body.position.y + movePosition.y,
+        body.position.z + movePosition.z
+      );
+
+      if (char) {
+        // console.log("character set Up");
+        const bodyYaw = camera.rotation.y;
+        // console.log("rotationY: "+ bodyYaw)
+        const rotationQuaternion = new THREE.Quaternion();
+        rotationQuaternion.setFromAxisAngle(
+          new THREE.Vector3(0, 1, 0),
+          bodyYaw
+        );
+        body.quaternion.x += (rotationQuaternion.x - body.quaternion.x)*1.4;
+        body.quaternion.y += (rotationQuaternion.y - body.quaternion.y)*1.4;
+        body.quaternion.z += (rotationQuaternion.z - body.quaternion.z)* 1.4;
+        body.quaternion.w += (rotationQuaternion.w - body.quaternion.w)*1.4
+        
+
+      
+   
+        body.quaternion.copy(rotationQuaternion);
+        // console.log("rotationQuaternion: "+ body.quaternion.y)
+      }
+
+      // body.velocity.set(moveSpeed.x, moveSpeed.y, moveSpeed.z);
     };
 
-    controls.addEventListener("lock", () => {
-      console.log("controls+ " + controls.isLocked);
-    });
-
-    controls.addEventListener("unlock", () => {
-      console.log("controls+ " + controls.islocked);
-    });
     controls.enableDamping = true;
 
     controls.enableDamping = 0.05;
     controls.update();
 
     const animate = () => {
+
+     const before = body.quaternion
       world.fixedStep(1 / 60);
+      // console.log("After Physics Update - Body Quaternion:", body.quaternion.x == before.x);
       Action();
-      if (char && body) {
-        char.position.set(body.position.x, body.position.y, body.position.z);
-        char.quaternion.set(
+      camera.rotation.x = Math.max(
+        MIN_PITCH,
+        Math.min(MAX_PITCH, camera.rotation.x)
+      );
+      camera.rotation.y = Math.max(
+        MIN_YAW,
+        Math.min(MAX_YAW, camera.rotation.y)
+      );
+      camera.rotation.z = 0;
+      if (char && body && cameraRef.current) {
+        char.position.copy(body.position);
+        const bodyQuaternion = new THREE.Quaternion(
           body.quaternion.x,
           body.quaternion.y,
           body.quaternion.z,
           body.quaternion.w
         );
+        const flipQua = new THREE.Quaternion().setFromAxisAngle(
+          new THREE.Vector3(0, 1, 0),
+          Math.PI
+        );
+        const newCameraQua = bodyQuaternion.clone().multiply(flipQua);
+
+        char.quaternion.copy(newCameraQua);
+        camera.position.set(
+          body.position.x,
+          cameraRef.current,
+          body.position.z - cameraOffset.current
+        );
+      //   const bodyEuler = new THREE.Euler().setFromQuaternion(body.quaternion);
+      //   const bodyYaw = bodyEuler.y; // Body's yaw angle in radians
+      //  console.log("body: "+ bodyYaw )
+      const charEuler = new THREE.Euler().setFromQuaternion(char.quaternion);
+const charYaw = charEuler.y;
+// console.log("char: "+ charYaw )
+
       }
 
       renderer.render(scene, camera);
 
-  
       requestAnimationFrame(animate);
     };
     animate();
