@@ -12,8 +12,13 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
 import Room from "@/utility/game.js";
 const Scene = () => {
   const ref = useRef(null);
-
+  const sceneRef = useRef(null);
+  const cameraRef = useRef(null);
+  const modelRef = useRef(null);
+  const rendererRef = useRef(null);
+  const composerRef = useRef(null);
   useEffect(() => {
+    if (!sceneRef.current) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       65,
@@ -61,6 +66,10 @@ const Scene = () => {
     composer.addPass(outlinePass);
     const outputPass = new OutputPass();
     composer.addPass(outputPass);
+    sceneRef.current = scene;
+    cameraRef.current = camera;
+    rendererRef.current = renderer;
+    composerRef.current = composer;
 
     const loader = new GLTFLoader();
 
@@ -69,26 +78,33 @@ const Scene = () => {
 
     camera.lookAt(0, 2, 0);
 
-    let model;
-    loader.load(
-      "/globe.glb",
-      (gltf) => {
-        model = gltf.scene;
 
-        model.scale.set(3.5, 3.5, 3.5);
-        scene.add(model);
-        outlinePass.selectedObjects = [model];
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
+    if (!modelRef.current) {
+      loader.load(
+        "/globe.glb",
+        (gltf) => {
+          const model = gltf.scene;
 
-        model.position.y += model.position.y - center.y;
-        model.position.z += model.position.z - center.z;
-      },
-      undefined,
-      (err) => {
-        console.error(err);
-      }
-    );
+          model.scale.set(3.5, 3.5, 3.5);
+        
+          modelRef.current = model;
+          scene.add(modelRef.current);
+          outlinePass.selectedObjects = [model];
+          const box = new THREE.Box3().setFromObject(model);
+          const center = box.getCenter(new THREE.Vector3());
+
+          model.position.y += model.position.y - center.y;
+          model.position.z += model.position.z - center.z;
+        },
+        undefined,
+        (err) => {
+          console.error(err);
+        }
+      );
+    } else {
+      scene.add(modelRef.current);
+      outlinePass.selectedObjects = [modelRef.current];
+    }
     let isDragging = false;
     let previous = { x: 0, y: 0 };
     const onMouseDown = (e) => {
@@ -96,11 +112,11 @@ const Scene = () => {
       previous = { x: e.clientX, y: e.clientY };
     };
     const onMouseMove = (e) => {
-      if (isDragging && model) {
+      if (isDragging && modelRef.current) {
         const dx = e.clientX - previous.x;
         const dy = e.clientY - previous.y;
-        model.rotation.y += dx * 0.01;
-        model.rotation.x += dy * 0.01;
+        model.current.rotation.y += dx * 0.01;
+        model.current.rotation.x += dy * 0.01;
         previous = { x: e.clientX, y: e.clientY };
       }
     };
@@ -112,12 +128,14 @@ const Scene = () => {
     renderer.domElement.addEventListener("mousemove", onMouseMove);
 
     const animate = () => {
-      if (model) {
-        model.rotation.y += 0.005;
+      if (modelRef.current) {
+        modelRef.current.rotation.y += 0.005;
         // controller.update()
       }
+      if (composerRef.current) {
+        composerRef.current.render();
+      }
 
-      composer.render();
 
       requestAnimationFrame(animate);
     };
@@ -132,6 +150,10 @@ const Scene = () => {
     window.addEventListener("resize", handleResize);
 
     return () => {
+      if (modelRef.current) {
+        scene.remove(modelRef.current);
+        modelRef.current = null;
+      }
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mouseup", onMouseUp);
@@ -140,10 +162,9 @@ const Scene = () => {
       if (ref.current) {
         ref.current.removeChild(renderer.domElement);
       }
-
-      renderer.dispose();
-      camera.dispose();
-    };
+      if (renderer){
+      renderer.dispose();}
+    };}
   }, []);
   return (
     <div
@@ -165,10 +186,14 @@ const Main = () => {
   const two = useMemo(() => ({ name: "About Me", link: "./About" }), []);
   const three = useMemo(() => ({ name: "Contact", link: "./Contact" }), []);
   const [svgContent, setSvgContent] = useState(null);
-  const [isFinished, setIsFinished]= useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [done, setDone] = useState(false);
   const [initial, setInitial] = useState(true);
+  const clickHandler = () => {
+    console.log("clicked");
+    setInitial(false);
+  };
   useEffect(() => {
     const controller = new AbortController();
 
@@ -220,7 +245,7 @@ const Main = () => {
 
   const loadingT = useMemo(() => "Hacking in ...", []);
   const loadingN = `Data Breaching: ${LoadingNumber}%`;
-  const finishedText = useMemo(() =>"Target position is located...", []);
+  const finishedText = useMemo(() => "Target position is located...", []);
   const intro = useMemo(
     () => "Target has been initialized\n\nSearching the Map... ",
     []
@@ -337,9 +362,13 @@ const Main = () => {
     };
   }, [hover, shaking, doneL]);
 
-  return (
-    initial? <Room />: 
-
+  return initial ? (
+    <Room
+      clickHandler={() => {
+        clickHandler();
+      }}
+    />
+  ) : (
     <div className="relative h-screen w-screen bg-[#FEE801] overflow-auto justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
         <div className="relative w-full h-fit flex flex-row justify-between items-center ">
@@ -386,20 +415,15 @@ const Main = () => {
                     ></div>
                   </motion.div>
                 </div>
-              ) : 
-                isFinished? (
-                  <MatrixEffect
+              ) : isFinished ? (
+                <MatrixEffect
                   key={finishedText}
                   finalText={finishedText}
                   speed={30}
                   text={"text"}
                   flickerspeed={20}
-                 
                 />
-                ):
-              
-              
-              (
+              ) : (
                 <MatrixEffect
                   key={intro}
                   finalText={intro}
@@ -409,10 +433,6 @@ const Main = () => {
                   callback={doneCallback}
                 />
               )
-
-
-
-
             ) : (
               <div className="w-full h-full flex justify-center items-center">
                 <MatrixEffect
@@ -443,7 +463,6 @@ const Main = () => {
          bg-contain bg-center bg-no-repeat rounded-[10px] border border-blue-500  shadow-bottom"
                     variants={shakeVariants}
                     animate={shaking ? "shake" : "idle"}
-                   
                   >
                     {svgContent && (
                       <div

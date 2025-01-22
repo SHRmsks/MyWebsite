@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 const MatrixText =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?むのませおやあいきつしれりらほそひ";
 
-const MatrixEffect = ({ finalText, speed, flickerspeed, callback, text }) => {
+const MatrixEffect = ({ finalText, speed, flickerspeed, callback, text, callback2 }) => {
   const [displayText, setDisplayText] = useState("");
   const [resolved, setResolved] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -26,6 +26,9 @@ const MatrixEffect = ({ finalText, speed, flickerspeed, callback, text }) => {
     if (currentIndex >= finalText.length) {
       setDisplayText(finalText);
       setIsAnimated(false);
+      if (callback2) {
+      callback2()
+      }
       if (callback) {
         const timeout = setTimeout(callback, 1500);
         return () => clearTimeout(timeout);
@@ -88,10 +91,10 @@ const MatrixEffect = ({ finalText, speed, flickerspeed, callback, text }) => {
       initial="initial"
       animate={isAnimated ? "matrix" : "static"}
     >
-      {displayText && displayText.split("\n").map((line, ind) => (
+      {displayText && displayText.split("\n").map((line, ind,arr) => (
         <React.Fragment key={ind}>
           <p>{line}</p>
-          <br />
+         { ind< arr.length-1 && <br />}
         </React.Fragment>
       ))}
     </motion.div>

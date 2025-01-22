@@ -2,18 +2,20 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import "../app/global.css";
 import Stats from "three/examples/jsm/libs/stats.module";
-import { motion } from "motion/react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
+import PlayButton from "./play.js";
 import * as Cannon from "cannon-es";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
-const Room = () => {
+const Room = ({ clickHandler }) => {
   const gameRef = useRef(null);
   const minY = useRef(null);
   const [locked, setLocked] = useState(false);
+  const [UI, setUI] = useState(true);
+  const [first, setFirst] = useState(true);
   const cameraRef = useRef(null);
   const cameraOffset = useRef();
+
   useEffect(() => {
     const world = new Cannon.World({
       gravity: new Cannon.Vec3(0, -9.81, 0),
@@ -102,7 +104,7 @@ const Room = () => {
             // console.log("half Height: "+ sizeCenter.y)
             // console.log("height "+  size.y)
             char.position.set(0, 0.01 + Math.abs(min.y + minY.current), 0);
-            console.log("character position " + char.position.y);
+            // console.log("character position " + char.position.y);
             body.position.set(
               char.position.x,
               char.position.y,
@@ -124,6 +126,7 @@ const Room = () => {
           },
           undefined,
           (err) => {
+            
             console.error(err);
             reject(err);
           }
@@ -150,19 +153,27 @@ const Room = () => {
     const MAX_PITCH = Math.PI / 6;
     const MIN_PITCH = -Math.PI / 6;
     const controls = new PointerLockControls(camera, renderer.domElement);
-
-    let keyDowns = {};
-    document.addEventListener("click", () => {
-      if (locked === false) controls.lock();
+    controls.addEventListener("unlock", () => {
+      setUI(true);
+      console.log("unlocked");
     });
-    document.addEventListener("keydown", (e) => {
+    controls.addEventListener("lock", () => {
+      setUI(false);
+      console.log("locked");
+    });
+    let keyDowns = {};
+   const ClickHandler =  document.addEventListener("click", () => {
+      if (first) setFirst(false);
+      if (!locked&&  renderer.domElement.isConnected) controls.lock();
+    });
+   const keyDown =  document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         controls.unlock();
       }
 
       keyDowns[e.key.toLowerCase()] = true;
     });
-    document.addEventListener("keyup", (e) => {
+   const keyUp =  document.addEventListener("keyup", (e) => {
       keyDowns[e.key.toLowerCase()] = false;
     });
 
@@ -230,14 +241,11 @@ const Room = () => {
           new THREE.Vector3(0, 1, 0),
           bodyYaw
         );
-        body.quaternion.x += (rotationQuaternion.x - body.quaternion.x)*1.4;
-        body.quaternion.y += (rotationQuaternion.y - body.quaternion.y)*1.4;
-        body.quaternion.z += (rotationQuaternion.z - body.quaternion.z)* 1.4;
-        body.quaternion.w += (rotationQuaternion.w - body.quaternion.w)*1.4
-        
+        body.quaternion.x += (rotationQuaternion.x - body.quaternion.x) * 1.4;
+        body.quaternion.y += (rotationQuaternion.y - body.quaternion.y) * 1.4;
+        body.quaternion.z += (rotationQuaternion.z - body.quaternion.z) * 1.4;
+        body.quaternion.w += (rotationQuaternion.w - body.quaternion.w) * 1.4;
 
-      
-   
         body.quaternion.copy(rotationQuaternion);
         // console.log("rotationQuaternion: "+ body.quaternion.y)
       }
@@ -251,8 +259,7 @@ const Room = () => {
     controls.update();
 
     const animate = () => {
-
-     const before = body.quaternion
+      const before = body.quaternion;
       world.fixedStep(1 / 60);
       // console.log("After Physics Update - Body Quaternion:", body.quaternion.x == before.x);
       Action();
@@ -285,13 +292,12 @@ const Room = () => {
           cameraRef.current,
           body.position.z - cameraOffset.current
         );
-      //   const bodyEuler = new THREE.Euler().setFromQuaternion(body.quaternion);
-      //   const bodyYaw = bodyEuler.y; // Body's yaw angle in radians
-      //  console.log("body: "+ bodyYaw )
-      const charEuler = new THREE.Euler().setFromQuaternion(char.quaternion);
-const charYaw = charEuler.y;
-// console.log("char: "+ charYaw )
-
+        //   const bodyEuler = new THREE.Euler().setFromQuaternion(body.quaternion);
+        //   const bodyYaw = bodyEuler.y; // Body's yaw angle in radians
+        //  console.log("body: "+ bodyYaw )
+        const charEuler = new THREE.Euler().setFromQuaternion(char.quaternion);
+        const charYaw = charEuler.y;
+        // console.log("char: "+ charYaw )
       }
 
       renderer.render(scene, camera);
@@ -307,15 +313,26 @@ const charYaw = charEuler.y;
     window.addEventListener("resize", handleResize);
 
     return () => {
+      controls.unlock();
+      controls.dispose();
+      document.body.removeEventListener("keyup", keyUp)
+      document.body.removeEventListener("keydown", keyDown)
+      document.removeEventListener("click", ClickHandler)
+
       window.removeEventListener("resize", handleResize);
-      if (ref.current) {
-        ref.current.removeChild(renderer.domElement);
+      if (gameRef.current) {
+        gameRef.current.removeChild(renderer.domElement);
       }
       renderer.dispose();
-      camera.dispose();
+     
     };
   }, []);
 
-  return <div className="w-screen h-screen relatvie" ref={gameRef}></div>;
+  return (
+    <div className="w-screen h-screen flex flex-1 relative">
+      <div className="w-screen h-screen absolute z-0" ref={gameRef}></div>
+      {UI && <PlayButton begin={first} clickHandler={()=> {console.log("clickHandlerGame ", clickHandler); clickHandler()}} />}
+    </div>
+  );
 };
 export default Room;
