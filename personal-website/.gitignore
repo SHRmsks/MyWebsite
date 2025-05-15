@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# git lfs
+next
+personal-website
 # testing
 /coverage
 
