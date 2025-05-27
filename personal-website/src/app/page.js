@@ -1,178 +1,11 @@
 "use client";
 import Nav from "@/utility/Nav.js";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, Suspense, useCallback } from "react";
 import { motion } from "motion/react";
 import MatrixEffect from "@/utility/randomText.js";
-import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
+
 import Room from "@/utility/game.js";
-const Scene = () => {
-  const ref = useRef(null);
-  const sceneRef = useRef(null);
-  const cameraRef = useRef(null);
-  const modelRef = useRef(null);
-  const rendererRef = useRef(null);
-  const composerRef = useRef(null);
-  useEffect(() => {
-    if (!sceneRef.current) {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      65,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-
-    renderer.setSize(ref.current.offsetWidth, ref.current.offsetHeight);
-
-    ref.current.appendChild(renderer.domElement);
-
-    const light = new THREE.AmbientLight(0x5ef6ef, 1);
-    const pointLight = new THREE.PointLight(0x5ef6ef, 10, 10, 2);
-    pointLight.position.set(5, 3, 3);
-    const directionalLight = new THREE.DirectionalLight(0x5ef6ef, 5);
-    directionalLight.position.set(10, 10, 10); // Position it above and to the side
-    scene.add(directionalLight);
-
-    scene.add(pointLight);
-    scene.add(light);
-
-    const composer = new EffectComposer(
-      renderer,
-      new THREE.WebGLRenderTarget(
-        ref.current.offsetWidth,
-        ref.current.offsetHeight,
-        { format: THREE.RGBAFormat, transparent: true }
-      )
-    );
-    composer.setSize(ref.current.offsetWidth, ref.current.offsetHeight);
-    composer.addPass(new RenderPass(scene, camera));
-
-    const outlinePass = new OutlinePass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      scene,
-      camera
-    );
-    outlinePass.edgeStrength = 0.34;
-    outlinePass.edgeGlow = 0.35;
-    outlinePass.edgeThickness = 0.1;
-    outlinePass.visibleEdgeColor.set(0x5ef6ef);
-    composer.addPass(outlinePass);
-    const outputPass = new OutputPass();
-    composer.addPass(outputPass);
-    sceneRef.current = scene;
-    cameraRef.current = camera;
-    rendererRef.current = renderer;
-    composerRef.current = composer;
-
-    const loader = new GLTFLoader();
-
-    camera.position.z = 4;
-    camera.position.y = 5;
-
-    camera.lookAt(0, 2, 0);
-
-
-    if (!modelRef.current) {
-      loader.load(
-        "/globe.glb",
-        (gltf) => {
-          const model = gltf.scene;
-
-          model.scale.set(3.5, 3.5, 3.5);
-        
-          modelRef.current = model;
-          scene.add(modelRef.current);
-          outlinePass.selectedObjects = [model];
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-
-          model.position.y += model.position.y - center.y;
-          model.position.z += model.position.z - center.z;
-        },
-        undefined,
-        (err) => {
-          console.error(err);
-        }
-      );
-    } else {
-      scene.add(modelRef.current);
-      outlinePass.selectedObjects = [modelRef.current];
-    }
-    let isDragging = false;
-    let previous = { x: 0, y: 0 };
-    const onMouseDown = (e) => {
-      isDragging = true;
-      previous = { x: e.clientX, y: e.clientY };
-    };
-    const onMouseMove = (e) => {
-      if (isDragging && modelRef.current) {
-        const dx = e.clientX - previous.x;
-        const dy = e.clientY - previous.y;
-        model.current.rotation.y += dx * 0.01;
-        model.current.rotation.x += dy * 0.01;
-        previous = { x: e.clientX, y: e.clientY };
-      }
-    };
-    const onMouseUp = () => {
-      isDragging = false;
-    };
-    renderer.domElement.addEventListener("mousedown", onMouseDown);
-    renderer.domElement.addEventListener("mouseup", onMouseUp);
-    renderer.domElement.addEventListener("mousemove", onMouseMove);
-
-    const animate = () => {
-      if (modelRef.current) {
-        modelRef.current.rotation.y += 0.005;
-        // controller.update()
-      }
-      if (composerRef.current) {
-        composerRef.current.render();
-      }
-
-
-      requestAnimationFrame(animate);
-    };
-    animate();
-
-    const handleResize = () => {
-      camera.aspect = ref.current.offsetWidth / ref.current.offsetHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(ref.current.offsetWidth, ref.current.offsetHeight);
-      composer.setSize(ref.current.offsetWidth, ref.current.offsetHeight);
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      if (modelRef.current) {
-        scene.remove(modelRef.current);
-        modelRef.current = null;
-      }
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
-      window.removeEventListener("mousemove", onMouseMove);
-
-      if (ref.current) {
-        ref.current.removeChild(renderer.domElement);
-      }
-      if (renderer){
-      renderer.dispose();}
-    };}
-  }, []);
-  return (
-    <div
-      ref={ref}
-      className="h-[200px] w-full bg-[rgba(0,6,14,0.5)] rounded-[20px]"
-    ></div>
-  );
-};
+import Scene from "@/utility/room";
 
 const Main = () => {
   const [IP, setIP] = useState("");
@@ -182,28 +15,49 @@ const Main = () => {
   const [Glitter, setGlitter] = useState("glitter");
   const [LoadingNumber, setLoadingNumber] = useState(-1);
   const [doneL, setDoneL] = useState(false);
-  const one = useMemo(() => ({ name: "Projects", link: "./Projects" }), []);
-  const two = useMemo(() => ({ name: "About Me", link: "./About" }), []);
-  const three = useMemo(() => ({ name: "Contact", link: "./Contact" }), []);
+  const one = { name: "Projects", link: "./Projects" };
+  const two = { name: "About Me", link: "./About" };
+  const three = { name: "Contact", link: "./Contact" };
   const [svgContent, setSvgContent] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [done, setDone] = useState(false);
   const [initial, setInitial] = useState(true);
-  const clickHandler = () => {
-    console.log("clicked");
+  const [small, setSmall] = useState(false);
+  
+  const clickHandler = useCallback(() => {
     setInitial(false);
-  };
+  },[]);
   useEffect(() => {
+    const handleResize = () => {
+      setSmall(window.innerWidth < 640);
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  },[])
+  useEffect(() => {
+    
     const controller = new AbortController();
 
-    fetch("/api/ip")
-      .then((res) => res.json())
-      .then((data) => {
-        setIP(data.ip);
-        setOS(data.os);
-      })
-      .catch((err) => console.error(err));
+    const signal = controller.signal;
+    (async () => {
+      const res = await fetch("/api/ip", { signal: signal });
+      const data = await res.json();
+      try {
+        if (data) {
+          // console.log(data);
+          setIP(data.ip);
+          setOS(data.os);
+        }
+      } catch (err) {
+        setIP("unavaliable");
+        setOS("unavaliable");
+        console.error(err);
+      }
+    })();
 
     fetch("/world.svg")
       .then((response) => response.text())
@@ -235,7 +89,6 @@ const Main = () => {
   />
   </path>`
         );
-        console.log("replaced" + replaced);
         setSvgContent(replaced);
       })
       .catch((error) => console.error("Error loading SVG:", error));
@@ -243,13 +96,10 @@ const Main = () => {
     return () => controller.abort();
   }, []);
 
-  const loadingT = useMemo(() => "Hacking in ...", []);
+  const loadingT = "Hacking in ...";
   const loadingN = `Data Breaching: ${LoadingNumber}%`;
-  const finishedText = useMemo(() => "Target position is located...", []);
-  const intro = useMemo(
-    () => "Target has been initialized\n\nSearching the Map... ",
-    []
-  );
+  const finishedText = "Target position is located...";
+  const intro = "Target has been initialized\n\nSearching the Map... ";
 
   const loadedCallback = () => {
     setLoaded(true);
@@ -277,69 +127,60 @@ const Main = () => {
     setIsFinished(true);
   };
 
-  const Sharding = useMemo(
-    () => ({
-      initial: { clipPath: "polygon(0 0, 0 0, 0 0, 0 0 )" },
-      shard: {
-        clipPath: [
-          "polygon(0 0, 0 0, 0 0, 0 0)",
-          "polygon(0 0, 50% 0, 0 50%, 0 50%)",
-          "polygon(0 0, 100% 0, 0% 100%, 0 100%)",
-          // "polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 0)",
-          "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-        ],
-        x: [0, 5, -5, 5, 0],
-        y: [0, 5, -5, 5, 0],
-        z: [0, 0, 0, 0, 0],
-        transition: { duration: 0.8, ease: "easeInOut" },
+  const Sharding = {
+    initial: { clipPath: "polygon(0 0, 0 0, 0 0, 0 0 )" },
+    shard: {
+      clipPath: [
+        "polygon(0 0, 0 0, 0 0, 0 0)",
+        "polygon(0 0, 50% 0, 0 50%, 0 50%)",
+        "polygon(0 0, 100% 0, 0% 100%, 0 100%)",
+       
+        "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+      ],
+      x: [0, 5, -5, 5, 0],
+      y: [0, 5, -5, 5, 0],
+      z: [0, 0, 0, 0, 0],
+      transition: { duration: 0.8, ease: "easeInOut" },
+    },
+  };
+  const glitter = {
+    initial: { opacity: 0 },
+    glitter: {
+      opacity: [0, 0.3, 0.2, 0.5, 0.3, 0.8, 1],
+      x: [0, -1, 1, -2, 2, -1, 0],
+      y: [0, -1, 1, -2, 2, -1, 0],
+      transition: {
+        duration: 1,
+        ease: "easeInOut",
+        repeat: Infinity,
       },
-    }),
-    []
-  );
-  const glitter = useMemo(
-    () => ({
-      initial: { opacity: 0 },
-      glitter: {
-        opacity: [0, 0.3, 0.2, 0.5, 0.3, 0.8, 1],
-        x: [0, -1, 1, -2, 2, -1, 0],
-        y: [0, -1, 1, -2, 2, -1, 0],
-        transition: {
-          duration: 1,
-          ease: "easeInOut",
-          repeat: Infinity,
-        },
-      },
-      static: {
-        opacity: 1,
-        x: 0,
-        y: 0,
-      },
-      transition: { duration: 0.3, ease: "easeInOut" },
-    }),
-    []
-  );
+    },
+    static: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+    },
+    transition: { duration: 0.3, ease: "easeInOut" },
+  };
 
-  const shakeVariants = useMemo(
-    () => ({
-      idle: {
-        x: 0,
-        y: 0,
-        opacity: 1,
-        transition: { duration: 0.5, ease: "easeInOut" },
+  const shakeVariants = {
+    idle: {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeInOut" },
+    },
+    shake: {
+      opacity: [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
+      x: [0, -1, 1, -2, 2, -1, 0],
+      y: [0, -1, 1, -2, 2, -1, 0],
+      transition: {
+        duration: 0.6,
+        ease: "easeInOut",
+        repeat: Infinity,
       },
-      shake: {
-        opacity: [0, 0.3, 0.6, 0.5, 0.3, 0.8, 1],
-        x: [0, -1, 1, -2, 2, -1, 0],
-        y: [0, -1, 1, -2, 2, -1, 0],
-        transition: {
-          duration: 0.6,
-          ease: "easeInOut",
-          repeat: Infinity,
-        },
-      },
-    }),
-    []
-  );
+    },
+  };
 
   useEffect(() => {
     let glitterTimeout = null;
@@ -362,12 +203,8 @@ const Main = () => {
     };
   }, [hover, shaking, doneL]);
 
-  return initial ? (
-    <Room
-      clickHandler={() => {
-        clickHandler();
-      }}
-    />
+  return initial && !small ? (
+    <Room clickHandler={clickHandler} />
   ) : (
     <div className="relative h-screen w-screen bg-[#FEE801] overflow-auto justify-center px-[1%] py-[1%]">
       <div className="relative w-full h-full">
@@ -379,7 +216,6 @@ const Main = () => {
           <Nav one={one} two={two} third={three} />
         </div>
 
-        {/* the div */}
         <div className="flex relative  rounded-2xl flex-row w-full h-full flex-1 overflow-auto justify-around items-start gap-x-[10px] py-[20px] px-[10px] bg-gradient-to-br from-[#701610] via-[#400906] to-[#00060e]">
           <div className="relative flex flex-col gap-y-[10px] py-[10px] w-[30%] h-full">
             <div className="bg-contain bg-no-repeat bg-center w-[80px] h-[80px] bg-[url('/deco.png')]"></div>
@@ -400,7 +236,7 @@ const Main = () => {
 
             <Scene />
           </div>
-          <div className=" bg-center bg-cover bg-no-repeat w-[70%] h-full bg-cyber-container  px-[20px] pb-[50px] flex flex-col justify-around ">
+          <div className=" bg-center bg-cover bg-no-repeat w-[70%] h-full bg-cyber-container  px-[20px] pb-[50px] flex flex-col justify-center items-start sm:gap-y-[20px] md:gap-y-[30px] xl:gap-y-[60px] ">
             {loaded ? (
               !doneL ? (
                 <div className="flex w-fit h-fit gap-y-2 flex-col items-center self-center text-center text-[#18d95f] font-glitch text-[20px]">
@@ -447,8 +283,9 @@ const Main = () => {
             )}
 
             {done ? (
-              <div className="relative w-full h-auto py-1  gap-x-2">
+              <div className="relative flex flex-row w-full h-auto py-1 gap-x-2">
                 <motion.div
+                  className="w-2/3 h-fit"
                   variants={Sharding}
                   initial="initial"
                   animate="shard"
@@ -459,7 +296,7 @@ const Main = () => {
                   <motion.div
                     onMouseEnter={() => setHover(true)}
                     onMouseLeave={() => setHover(false)}
-                    className="relative z-[5] w-[60%]
+                    className="relative z-[5] w-full
          bg-contain bg-center bg-no-repeat rounded-[10px] border border-blue-500  shadow-bottom"
                     variants={shakeVariants}
                     animate={shaking ? "shake" : "idle"}
@@ -473,26 +310,27 @@ const Main = () => {
                   </motion.div>
                 </motion.div>
                 {hover && (
-                  <motion.div
-                    key={Glitter}
-                    className=" absolute flex flex-col justify-center py-4 gap-y-4 items-center text-start top-0 right-[2px] bg-[url('/Card.png')] bg-no-repeat bg-cover bg-center w-[30%] min-w-[200px] h-full z-10"
-                    variants={glitter}
-                    initial="initial"
-                    animate={Glitter}
-                  >
-                    <p className="text-[12px] font-text text-[#39c4b6] text-wrap break-words">
-                      {" "}
-                      Info detected: <br />
-                    </p>
-                    <p className="text-[12px] font-text text-[#39c4b6] text-wrap break-words flex-col ">
-                      Name: Haoran <br />
-                      Age: 21 <br />
-                      Gender: Male <br />
-                      Location: China <br />
-                      Affiliation: BU <br />
-                      Title: Noobie <br />
-                    </p>
-                  </motion.div>
+                  <div className="flex flex-col justify-center items-center w-1/3 h-full">
+                    <motion.div
+                      key={Glitter}
+                      className="  flex flex-col justify-center py-4 gap-y-4 items-center text-start  bg-[url('/Card.png')] bg-no-repeat bg-cover bg-center w-full  h-full z-10"
+                      variants={glitter}
+                      initial="initial"
+                      animate={Glitter}
+                    >
+                      <p className="text-[5px] sm:text-[8px] md:text[10px] lg:text[12px] xl:text[14px] font-text text-[#39c4b6] text-wrap break-words">
+                        Info detected: <br />
+                      </p>
+                      <p className="text-[5px] sm:text-[8px] md:text[10px] lg:text[12px] xl:text[14px] font-text text-[#39c4b6] text-wrap break-words flex-col ">
+                        Name: Haoran <br />
+                        Age: 21 <br />
+                        Gender: Male <br />
+                        Location: China <br />
+                        Affiliation: BU <br />
+                        Title: Noobie <br />
+                      </p>
+                    </motion.div>
+                  </div>
                 )}
               </div>
             ) : null}

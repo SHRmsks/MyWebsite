@@ -7,21 +7,21 @@ import { motion } from "motion/react";
 import tailwindConfig from "../../tailwind.config.mjs";
 const SkillWeb = ({ skills, vals }) => {
   const chartRef = useRef(null);
-const [Aratio, SetRatio] = useState(null);
+  const [Aratio, SetRatio] = useState(null);
 
   useEffect(() => {
     const myChartRef = chartRef.current.getContext("2d");
-    if(Chart.getChart(myChartRef)){
-        Chart.getChart(myChartRef).destroy();
+    if (Chart.getChart(myChartRef)) {
+      Chart.getChart(myChartRef).destroy();
     }
-   const chart=  new Chart(myChartRef, {
+    const chart = new Chart(myChartRef, {
       type: "radar",
       data: {
         labels: skills,
         datasets: [
           {
             label: "Skills",
-            data: [8,6,5,4,4,6,5,4,7],
+            data: [8, 6, 5, 4, 4, 6, 5, 4, 7],
             fill: true,
             backgroundColor: "rgba(57, 196, 182, 0.8)",
             borderColor: "rgba(17, 102, 93, 1)",
@@ -55,13 +55,11 @@ const [Aratio, SetRatio] = useState(null);
                 size: 10,
                 family: "text",
               },
-              
             },
-            min:0,
-            max:10,
+            min: 0,
+            max: 10,
             ticks: {
-           
-            stepSize:2,
+              stepSize: 2,
               beginAtZero: true,
               display: false,
             },
@@ -72,7 +70,13 @@ const [Aratio, SetRatio] = useState(null);
     const ratio = chart.width / chart.height;
     SetRatio(ratio);
   }, [skills, vals]);
-  return <canvas className="w-[400px]" style={{height: Aratio? `${400/Aratio}px`: 'auto'}} ref={chartRef}></canvas>;
+  return (
+    <canvas
+      className="w-[400px]"
+      style={{ height: Aratio ? `${400 / Aratio}px` : "auto" }}
+      ref={chartRef}
+    ></canvas>
+  );
 };
 
 export default SkillWeb;

@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Nav from "@/utility/Nav.js";
 import { motion } from "motion/react";
 import SkillTree from "@/utility/SkillTree";
@@ -13,48 +7,43 @@ import TreeMap from "@/utility/TreeMap";
 import SkillWeb from "@/utility/skillDiagram";
 
 const Main = () => {
-  const skills = useMemo(
-    () => [
-      "FrontEnd",
-      "BackEnd",
-      "Database",
-      "Design",
-      "Management",
-      "Algorithm",
-      "Machine Learning",
-      "UI",
-      "Coding",
-    ],
-    []
-  );
-  const vals = useMemo(() => [8, 6, 5, 4, 4, 6, 5, 4, 7], []);
+  const skills = [
+    "FrontEnd",
+    "BackEnd",
+    "Database",
+    "Design",
+    "Management",
+    "Algorithm",
+    "Machine Learning",
+    "UI",
+    "Coding",
+  ];
+  const vals = [8, 6, 5, 4, 4, 6, 5, 4, 7];
 
-  const glitter = useMemo(
-    () => ({
-      initial: { opacity: 0 },
-      glitter: {
-        opacity: [0, 0.4, 0.3, 0.6, 0.4, 0.8, 1],
-        x: [0, -1, 1, -2, 2, -1, 0],
-        y: [0, -1, 1, -2, 2, -1, 0],
-        transition: {
-          duration: 1,
-          ease: "easeInOut",
-          repeat: Infinity,
-        },
+  const glitter = {
+    initial: { opacity: 0 },
+    glitter: {
+      opacity: [0, 0.4, 0.3, 0.6, 0.4, 0.8, 1],
+      x: [0, -1, 1, -2, 2, -1, 0],
+      y: [0, -1, 1, -2, 2, -1, 0],
+      transition: {
+        duration: 1,
+        ease: "easeInOut",
+        repeat: Infinity,
       },
-      static: {
-        opacity: 1,
-        x: 0,
-        y: 0,
-      },
-      transition: { duration: 0.3, ease: "easeInOut" },
-    }),
-    []
-  );
+    },
+    static: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+    },
+    transition: { duration: 0.3, ease: "easeInOut" },
+  };
+
   const [Glitter, setGlitter] = useState("glitter");
-  const one = useMemo(() => ({ name: "Home", link: "../" }), []);
-  const two = useMemo(() => ({ name:  "About Me", link: "/About" }), []);
-  const three = useMemo(() => ({ name: "Contact", link: "/Contact" }), []);
+  const one = { name: "Home", link: "../" };
+  const two = { name: "About Me", link: "/About" };
+  const three = { name: "Contact", link: "/Contact" };
 
   useEffect(() => {
     const glitterEffect = setTimeout(() => {
@@ -62,63 +51,55 @@ const Main = () => {
     }, 3000);
     return () => clearTimeout(glitterEffect);
   }, []);
-  const MobileSkills = useMemo(
-    () => ({
-      frontEndPTS: 7,
-      backEndPTS: 6,
-      databasePTS: 4,
-      designPTS: 2,
-      managementPTS: 3,
-      algoPTS: 0,
-    }),
-    []
-  );
-  const Hackthon = useMemo(
-    () => ({
-      frontEndPTS: 5,
-      backEndPTS: 5,
-      databasePTS: 0,
-      designPTS: 2,
-      managementPTS: 1,
-      algoPTS: 7,
-    }),
-    []
-  );
+  const MobileSkills = {
+    frontEndPTS: 7,
+    backEndPTS: 6,
+    databasePTS: 4,
+    designPTS: 2,
+    managementPTS: 3,
+    algoPTS: 0,
+  };
 
-  const srcarr = useMemo(() => ["/skill1.png", "/skill2.png", "/skill3.png"], []);
-  const labelarr = useMemo(() => ["Skill Tree", "react", "react"], []);
-  const props = useMemo(
-    () => [
-      {},
-      {
-        local: true,
-        pjName: "Work Shift Management",
-        link: "/demo.mp4",
-        skills: MobileSkills,
-        framework: "Flutter",
-        Icon: "/flutter.svg",
-        intro: "An easy team-managemnt App that derived from website",
-      },
-      {
-        local: false,
-        skills: Hackthon,
-        link: "https://www.youtube.com/embed/ysVSmk_bnWM",
-        pjName: "Recycle Master",
-        framework: "React Native",
-        Icon: "/react.svg",
-        intro:
-          "A recyclable detection mobile App that is powered with YOLO_8 in 24hrs",
-      },
-    ],
-    []
-  );
+  const Hackthon = {
+    frontEndPTS: 5,
+    backEndPTS: 5,
+    databasePTS: 0,
+    designPTS: 2,
+    managementPTS: 1,
+    algoPTS: 7,
+  };
+
+  const srcarr = ["/skill1.png", "/skill2.png", "/skill3.png"];
+  const labelarr = ["Skill Tree", "Flutter", "React Native"];
+  const props = [
+    {},
+    {
+      local: true,
+      pjName: "Work Shift Management",
+      link: "/demo.mp4",
+      skills: MobileSkills,
+      framework: "Flutter",
+      Icon: "/flutter.svg",
+      intro: "An easy team-managemnt App that derived from website",
+    },
+    {
+      local: false,
+      skills: Hackthon,
+      link: "https://www.youtube.com/embed/ysVSmk_bnWM",
+      pjName: "Recycle Master",
+      framework: "React Native",
+      Icon: "/react.svg",
+      intro:
+        "A recyclable detection mobile App that is powered with YOLO_8 in 24hrs",
+    },
+  ];
+
   const parentRef = useRef(null);
   const [height, setHeight] = useState(0);
   const [isReady, setIsReady] = useState(false);
 
   const update = useCallback(() => {
     if (parentRef.current) {
-     
       setHeight(parentRef.current.offsetHeight);
       setIsReady(true);
     }
@@ -140,19 +121,19 @@ const Main = () => {
 
       <div
         ref={parentRef}
-        className="bg-[url('/background.png')] relative bg-cover h-[90%] overflow-auto flex-1 w-full bg-no-repeat rounded-lg bg-center  px-[5px] py-[8px] flex flex-col justify-between gap-y-[10px]"
+        className="bg-[url('/background.png')] z-0 relative bg-cover h-[90%] overflow-auto flex-1 w-full bg-no-repeat rounded-lg bg-center  px-[5px] py-[8px] flex flex-col justify-between gap-y-[10px]"
       >
         {isReady && (
-          <div style={{ height: `${height}px` }} className="w-full z-0">
+          <div style={{ height: `${height}px` }} className="w-full z-10">
             <TreeMap srcArr={srcarr} labelArr={labelarr} props={props} />
           </div>
         )}
-        <div className="bottom-0 right-0 absolute w-[20%] h-[20%] z-10 bg-black backdrop-opacity-[30px] backdrop-blur-md rounded-md">
+        <div className="bottom-0 right-0 absolute w-[400px] h-[200px] z-20 bg-[url('/background.png')] backdrop-opacity-[30px] backdrop-blur-md rounded-md bg-no-repeat bg-fixed bg-cover bg-center">
           <motion.div
             variants={glitter}
             initial="initial"
             animate={Glitter}
-            className="bottom-[5px] right-0 absolute w-fit h-fit z-20 bg-[url('/background.png')] backdrop-blur-sm backdrop-opacity-20 rounded-md flex justify-center bg-no-repeat bg-center items-center "
+            className="bottom-[5px] right-0 absolute  max-w-[100px] lg:max-w-[300px] xl:max-w-[400px] md:max-w-[200px] sm:max-w-[150px] h-fit z-30 items-center "
           >
             <SkillWeb skills={skills} vals={vals} />
           </motion.div>

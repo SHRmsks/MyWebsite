@@ -47,7 +47,7 @@ const PlayButton = ({ begin, clickHandler }) => {
           onClick={(e) => {
             // console.log("clicked")
             e.stopPropagation();
-            console.log("clickHandler", clickHandler)
+            console.log("clickHandler", clickHandler);
             clickHandler();
           }}
         >

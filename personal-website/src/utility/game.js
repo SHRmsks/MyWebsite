@@ -15,8 +15,9 @@ const Room = ({ clickHandler }) => {
   const [first, setFirst] = useState(true);
   const cameraRef = useRef(null);
   const cameraOffset = useRef();
-
+  let animationRef = null;
   useEffect(() => {
+    let cancelled = false;
     const world = new Cannon.World({
       gravity: new Cannon.Vec3(0, -9.81, 0),
     });
@@ -50,15 +51,16 @@ const Room = ({ clickHandler }) => {
         loader.load(
           "/cyberpunkRoom.glb",
           (gltf) => {
+            if (cancelled) return;
             model = gltf.scene;
             const boxBounds = new THREE.Box3().setFromObject(model);
             const size = new THREE.Vector3();
             minY.current = boxBounds.min.y;
-            // console.log("building min: " + minY.current);
+
             boxBounds.getSize(size);
             boxWidth = size.x;
             boxLength = size.z;
-            // console.log("boxWidth, boxHeight" + boxWidth + boxLength);
+
             scene.add(model);
 
             const floor = new Cannon.Body({
@@ -74,6 +76,7 @@ const Room = ({ clickHandler }) => {
           undefined,
           (err) => {
             console.error(err);
+            if (cancelled) return;
             reject(err);
           }
         );
@@ -83,6 +86,7 @@ const Room = ({ clickHandler }) => {
         loader.load(
           "/human.glb",
           (gltf) => {
+            if (cancelled) return;
             char = gltf.scene;
 
             char.scale.set(0.01, 0.01, 0.01);
@@ -126,7 +130,7 @@ const Room = ({ clickHandler }) => {
           },
           undefined,
           (err) => {
-            
+            if (cancelled) return;
             console.error(err);
             reject(err);
           }
@@ -162,20 +166,22 @@ const Room = ({ clickHandler }) => {
       console.log("locked");
     });
     let keyDowns = {};
-   const ClickHandler =  document.addEventListener("click", () => {
+    const ClickHandler = () => {
       if (first) setFirst(false);
-      if (!locked&&  renderer.domElement.isConnected) controls.lock();
-    });
-   const keyDown =  document.addEventListener("keydown", (e) => {
+      if (!locked && renderer.domElement.isConnected) controls.lock();
+    };
+    const keyDown = (e) => {
       if (e.key === "Escape") {
         controls.unlock();
       }
-
       keyDowns[e.key.toLowerCase()] = true;
-    });
-   const keyUp =  document.addEventListener("keyup", (e) => {
+    };
+    const keyUp = (e) => {
       keyDowns[e.key.toLowerCase()] = false;
-    });
+    };
+    document.body.addEventListener("keyup", keyUp);
+    document.body.addEventListener("keydown", keyDown);
+    document.addEventListener("click", ClickHandler);
 
     const Action = () => {
       const speed = 1;
@@ -191,38 +197,27 @@ const Room = ({ clickHandler }) => {
       leftVector.normalize();
       forwardVector.normalize();
 
-      // let moveSpeed = new Cannon.Vec3(0, 0, 0);
       let movePosition = new Cannon.Vec3(0, 0, 0);
       if (keyDowns["w"]) {
-        // body.applyImpulse(forwardVector.scale(speed), body.position);
         movePosition = movePosition.vadd(
           forwardVector.multiplyScalar(speed * deltaTime)
         );
-        // moveSpeed = moveSpeed.vadd(forwardVector.scale(speed));
-        // console.log("Body velocity:", body.velocity);
       }
       if (keyDowns["s"]) {
         movePosition = movePosition.vadd(
           forwardVector.multiplyScalar(-speed * deltaTime)
         );
-        // body.applyImpulse(forwardVector.scale(-speed), body.position);
-        // moveSpeed = moveSpeed.vadd(forwardVector.scale(-speed));
       }
       if (keyDowns["a"]) {
         movePosition = movePosition.vadd(
           leftVector.multiplyScalar(-speed * deltaTime)
         );
-        //  moveSpeed = moveSpeed.vadd(rightVector.scale(-speed));
       }
 
       if (keyDowns["d"]) {
         movePosition = movePosition.vadd(
           leftVector.multiplyScalar(speed * deltaTime)
         );
-
-        // moveSpeed = moveSpeed.vadd(rightVector.scale(speed)
-
-        // );
       }
       body.angularFactor.set(0, 1, 0);
 
@@ -233,9 +228,8 @@ const Room = ({ clickHandler }) => {
       );
 
       if (char) {
-        // console.log("character set Up");
         const bodyYaw = camera.rotation.y;
-        // console.log("rotationY: "+ bodyYaw)
+
         const rotationQuaternion = new THREE.Quaternion();
         rotationQuaternion.setFromAxisAngle(
           new THREE.Vector3(0, 1, 0),
@@ -247,10 +241,7 @@ const Room = ({ clickHandler }) => {
         body.quaternion.w += (rotationQuaternion.w - body.quaternion.w) * 1.4;
 
         body.quaternion.copy(rotationQuaternion);
-        // console.log("rotationQuaternion: "+ body.quaternion.y)
       }
-
-      // body.velocity.set(moveSpeed.x, moveSpeed.y, moveSpeed.z);
     };
 
     controls.enableDamping = true;
@@ -261,7 +252,7 @@ const Room = ({ clickHandler }) => {
     const animate = () => {
       const before = body.quaternion;
       world.fixedStep(1 / 60);
-      // console.log("After Physics Update - Body Quaternion:", body.quaternion.x == before.x);
+
       Action();
       camera.rotation.x = Math.max(
         MIN_PITCH,
@@ -302,7 +293,7 @@ const Room = ({ clickHandler }) => {
 
       renderer.render(scene, camera);
 
-      requestAnimationFrame(animate);
+      animationRef = requestAnimationFrame(animate);
     };
     animate();
     const handleResize = () => {
@@ -313,25 +304,44 @@ const Room = ({ clickHandler }) => {
     window.addEventListener("resize", handleResize);
 
     return () => {
+      cancelled = true;
       controls.unlock();
       controls.dispose();
-      document.body.removeEventListener("keyup", keyUp)
-      document.body.removeEventListener("keydown", keyDown)
-      document.removeEventListener("click", ClickHandler)
+      cancelAnimationFrame(animationRef);
+      document.body.removeEventListener("keyup", keyUp);
+      document.body.removeEventListener("keydown", keyDown);
 
+      document.removeEventListener("click", ClickHandler);
       window.removeEventListener("resize", handleResize);
       if (gameRef.current) {
         gameRef.current.removeChild(renderer.domElement);
       }
+      scene.traverse((child) => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach((material) => material.dispose());
+          } else {
+            child.material.dispose();
+          }
+        }
+      });
       renderer.dispose();
-     
     };
-  }, []);
+  }, [clickHandler, gameRef]);
 
   return (
     <div className="w-screen h-screen flex flex-1 relative">
       <div className="w-screen h-screen absolute z-0" ref={gameRef}></div>
-      {UI && <PlayButton begin={first} clickHandler={()=> {console.log("clickHandlerGame ", clickHandler); clickHandler()}} />}
+      {UI && (
+        <PlayButton
+          begin={first}
+          clickHandler={() => {
+            console.log("clickHandlerGame", clickHandler);
+            clickHandler();
+          }}
+        />
+      )}
     </div>
   );
 };
