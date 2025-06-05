@@ -37,6 +37,7 @@ const Room = ({ clickHandler }) => {
 
     let model;
     let char; // the character
+    let cat;
     let boxLength;
     let boxWidth;
     const loader = new GLTFLoader();
@@ -45,6 +46,7 @@ const Room = ({ clickHandler }) => {
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 10, 5);
     scene.add(directionalLight);
+
 
     const LoadRoom = () =>
       new Promise((resolve, reject) => {
@@ -105,10 +107,9 @@ const Room = ({ clickHandler }) => {
 
             cameraOffset.current = sizeCenter.z + 0.2;
 
-            // console.log("half Height: "+ sizeCenter.y)
-            // console.log("height "+  size.y)
+          
             char.position.set(0, 0.01 + Math.abs(min.y + minY.current), 0);
-            // console.log("character position " + char.position.y);
+           
             body.position.set(
               char.position.x,
               char.position.y,
@@ -136,11 +137,42 @@ const Room = ({ clickHandler }) => {
           }
         );
       });
+      const Cat = ()=> {
+        new Promise((res, rej)=> {
+          loader.load("/cat.glb",
+            (gltf)=> {
+  if (cancelled) return;
+  cat = gltf.scene;
+   cat.scale.set(2, 2, 2);
+  cat.updateWorldMatrix(true, true);
+  scene.add(cat);
+  res();
+            },
+            undefined,
+            (err) => {
+              if (cancelled) return;
+              console.error(err);
+              rej(err);
+            }
+          )
+        })
+      }
+      
+     
+       (async function loading (){
+        try {
+          await LoadRoom();
+          await LoadChar();
+          await Cat();
+          console.log("Model loaded");
+        } catch (err) {
+          console.error(err);
+        }
+      })()
+    
 
-    LoadRoom()
-      .then(() => LoadChar())
-      .then(() => console.log("Model loaded"))
-      .catch((err) => console.error(err));
+
+   
 
     const axisHelper = new THREE.AxesHelper(10);
     scene.add(axisHelper);
