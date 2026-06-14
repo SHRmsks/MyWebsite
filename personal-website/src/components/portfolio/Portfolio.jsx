@@ -19,7 +19,7 @@ import { profile } from "@/data/profile.js";
 
 export default function Portfolio({ canPlayGame = false, onEnterGame }) {
   return (
-    <div className="relative min-h-screen w-full bg-[#05070d] text-white">
+    <div className="relative min-h-screen w-full bg-[#05070d]   bg-opacity-40        text-white">
       <CyberBackground />
 
       {/* subtle CRT scanlines */}
@@ -47,7 +47,8 @@ export default function Portfolio({ canPlayGame = false, onEnterGame }) {
 
       <footer className="relative z-10 border-t border-[#39c4b6]/15 px-5 py-8 text-center">
         <p className="font-text text-[12px] tracking-[0.2em] text-[#5f7780]">
-          © {new Date().getFullYear()} {profile.name} · built with Next.js · Three.js · Tailwind
+          © {new Date().getFullYear()} {profile.name} · built with Next.js ·
+          Three.js · Tailwind
         </p>
       </footer>
     </div>
