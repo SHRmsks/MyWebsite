@@ -13,6 +13,7 @@ const MatrixEffect = ({
   callback,
   text,
   callback2,
+  className, // optional: override size/color (e.g. for big titles)
 }) => {
   const [displayText, setDisplayText] = useState("");
   // const [resolved, setResolved] = useState("");
@@ -90,7 +91,9 @@ const MatrixEffect = ({
   return (
     <motion.div
       style={{ fontFamily: text }}
-      className="text-[#39c4b6] overflow-x-hidden overflow-y-scroll w-fit max-w-full h-fit text-wrap break-words text-[18px] font-[400] py-[15px]"
+      className={`w-fit max-w-full h-fit text-wrap break-words ${
+        className || "text-[#39c4b6] text-[18px] font-[400] py-[15px]"
+      }`}
       variants={matrix}
       initial="initial"
       animate={isAnimated ? "matrix" : "static"}
