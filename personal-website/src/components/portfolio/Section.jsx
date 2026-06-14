@@ -23,7 +23,13 @@ export function Reveal({ children, delay = 0, y = 28, className = "" }) {
   );
 }
 
-export default function Section({ id, index, title, children, className = "" }) {
+export default function Section({
+  id,
+  index,
+  title,
+  children,
+  className = "",
+}) {
   return (
     <section
       id={id}
@@ -31,9 +37,6 @@ export default function Section({ id, index, title, children, className = "" }) 
     >
       <Reveal>
         <div className="mb-10 flex items-end gap-4">
-          <span className="font-text text-[13px] tracking-[0.3em] text-[#05d9e8]">
-            // {String(index).padStart(2, "0")}
-          </span>
           <h2 className="leading-none">
             <ScrambleTitle
               text={title}

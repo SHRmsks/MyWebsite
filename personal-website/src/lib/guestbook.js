@@ -19,6 +19,9 @@ export function loadFootsteps() {
     return [];
   }
 }
+export function hasThrown() {
+  return false;
+}
 
 /** Persist a new footstep and return it (with id + timestamp filled in). */
 export function addFootstep(entry) {

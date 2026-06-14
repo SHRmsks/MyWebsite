@@ -34,13 +34,21 @@ export default function Game({ mode = "desktop", onExit }) {
     };
   }, [mode]);
 
+  // When the terminal is activated, the engine flips to the "portal" phase; play the
+  // NEURAL CONNECTION animation briefly, then drop into the portfolio.
+  useEffect(() => {
+    if (hud.phase !== "portal") return;
+    const t = setTimeout(() => onExit?.(), 2000);
+    return () => clearTimeout(t);
+  }, [hud.phase, onExit]);
+
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-[#05070d]">
       <div ref={containerRef} className="absolute inset-0" />
       <GameHUD
         {...hud}
         isMobile={mode === "mobile"}
-        onPet={() => engineRef.current?.requestPet()}
+        onInteract={() => engineRef.current?.requestInteract()}
         onResume={() => engineRef.current?.requestLock()}
         onExit={onExit}
       />

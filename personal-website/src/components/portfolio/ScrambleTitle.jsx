@@ -11,8 +11,8 @@ export default function ScrambleTitle({
   text,
   className,
   font = "slant",
-  speed = 14, // ms per character — fast, as requested
-  flicker = 9,
+  speed = 11, // ms per character — fast, as requested
+  flicker = 7,
 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });

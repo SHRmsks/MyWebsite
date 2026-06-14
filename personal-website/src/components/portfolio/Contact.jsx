@@ -4,15 +4,15 @@
 import React from "react";
 import { motion } from "motion/react";
 import Section, { Reveal } from "./Section.jsx";
-import { profile } from "@/data/profile.js";
+import { profile } from "@/data/profile.ts";
 
 export default function Contact() {
   return (
     <Section id="contact" index={6} title="Contact">
       <Reveal>
         <p className="mb-8 max-w-[560px] font-text text-[15px] leading-[1.7] text-[#bcd6d0]">
-          Want to build something, collaborate, or just say hi? My channels are open —
-          reach out and let&apos;s make it.
+          Want to build something, collaborate, or just say hi? My channels are
+          open — reach out and let&apos;s make it.
         </p>
       </Reveal>
 
@@ -29,9 +29,15 @@ export default function Contact() {
             >
               {link.icon && (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={link.icon} alt="" className="h-7 w-7 object-contain" />
+                <img
+                  src={link.icon}
+                  alt=""
+                  className="h-7 w-7 object-contain"
+                />
               )}
-              <span className="font-cyberpunk text-[16px] text-[#05d9e8]">{link.label}</span>
+              <span className="font-cyberpunk text-[16px] text-[#05d9e8]">
+                {link.label}
+              </span>
               <span className="font-text text-[13px] text-[#9fb6b0]">
                 {link.href.replace(/^mailto:/, "").replace(/^https?:\/\//, "")}
               </span>

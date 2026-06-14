@@ -4,7 +4,7 @@ import "../app/global.css";
 import { motion } from "motion/react";
 
 const MatrixText =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?むのませおやあいきつしれりらほそひ";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-=+|?むのませおやあいきつしれりらほそひ你今晚发服务费范围变成称";
 
 const MatrixEffect = ({
   finalText,
@@ -24,10 +24,10 @@ const MatrixEffect = ({
       return Array.from({ length: currentIndex + 3 }, (_, i) =>
         i < currentIndex
           ? finalText[i]
-          : MatrixText[Math.floor(Math.random() * MatrixText.length)]
+          : MatrixText[Math.floor(Math.random() * MatrixText.length)],
       ).join("");
     },
-    [finalText]
+    [finalText],
   ); //callback for generate text
 
   useEffect(() => {
@@ -66,8 +66,8 @@ const MatrixEffect = ({
     },
     matrix: {
       opacity: [1, 0.9, 0.8, 0.9, 1],
-      y: [-3, 0, 3],
-      x: [0, -1, 1],
+      y: [-1, 0, 1],
+      x: [0, -0.5, 0.5],
       textShadow: [
         "2px 0px 2px rgba(0, 255, 0, 0.7)",
         "-2px 0px 2px rgba(255, 0, 0, 0.7)",

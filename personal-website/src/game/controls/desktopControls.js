@@ -6,7 +6,7 @@
 // The shared input contract (mutated here, read + reset by the engine each frame):
 //   input.move      : { x, y }  strafe / forward, each -1..1
 //   input.lookDelta : { x, y }  accumulated raw pixel deltas since last frame
-//   input.petRequested : boolean
+//   input.interactRequested : boolean  (E key, or click while locked)
 
 export function createDesktopControls(input, { canvas, onLockChange }) {
   const keys = {};
@@ -22,7 +22,7 @@ export function createDesktopControls(input, { canvas, onLockChange }) {
       keys[k] = true;
       syncMove();
     } else if (k === "e") {
-      input.petRequested = true;
+      input.interactRequested = true;
     }
     // Esc is handled by the browser, which exits pointer lock and fires
     // pointerlockchange below — no manual handling needed.
@@ -38,6 +38,13 @@ export function createDesktopControls(input, { canvas, onLockChange }) {
 
   const requestLock = () => {
     if (document.pointerLockElement !== canvas) canvas.requestPointerLock();
+  };
+
+  // Click locks the view when paused; while playing it fires the interaction
+  // (throw dart / access terminal / pet) just like pressing E.
+  const onCanvasClick = () => {
+    if (document.pointerLockElement === canvas) input.interactRequested = true;
+    else requestLock();
   };
 
   const onMouseMove = (e) => {
@@ -56,7 +63,7 @@ export function createDesktopControls(input, { canvas, onLockChange }) {
     onLockChange && onLockChange(locked);
   };
 
-  canvas.addEventListener("click", requestLock);
+  canvas.addEventListener("click", onCanvasClick);
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("pointerlockchange", onPointerLockChange);
   window.addEventListener("keydown", onKeyDown);
@@ -66,7 +73,7 @@ export function createDesktopControls(input, { canvas, onLockChange }) {
     isMobile: false,
     requestLock,
     dispose() {
-      canvas.removeEventListener("click", requestLock);
+      canvas.removeEventListener("click", onCanvasClick);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("pointerlockchange", onPointerLockChange);
       window.removeEventListener("keydown", onKeyDown);

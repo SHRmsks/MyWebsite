@@ -1,7 +1,7 @@
 // mobileControls.js
 // Touch controls for phones/tablets: a nipplejs virtual joystick (left half) drives
 // movement, and dragging anywhere on the right half drives look. The "Pet" button
-// lives in the React HUD and calls engine.requestPet(), so it isn't handled here.
+// lives in the React HUD and calls engine.requestInteract(), so it isn't handled here.
 //
 // Writes into the same shared `input` contract as desktopControls.
 

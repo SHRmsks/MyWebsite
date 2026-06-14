@@ -23,7 +23,8 @@ export default function CyberBackground() {
     // --- 2. SLOW DATA PILLARS SETUP ---
     const pillars = [];
     const NUM_PILLARS = 25;
-    const hexChars = "0123456789ABCDEF";
+    const hexChars =
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおかきくけこさしすせそたちゆよらりるれろわをん你反复问哦飞机无法俄界";
 
     // --- 3. KERNEL TELEMETRY LOGS ---
     const termLogs = [
@@ -63,8 +64,8 @@ export default function CyberBackground() {
           y: Math.random() * h,
           speed: Math.random() * 0.5 + 0.2, // Very slow
           chars: Array.from(
-            { length: 15 },
-            () => hexChars[Math.floor(Math.random() * 16)],
+            { length: hexChars.length },
+            () => hexChars[Math.floor(Math.random() * hexChars.length)],
           ),
         });
       }

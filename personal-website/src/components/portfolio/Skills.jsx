@@ -6,7 +6,7 @@ import React from "react";
 import { motion } from "motion/react";
 import Section, { Reveal } from "./Section.jsx";
 import SkillRadar from "./SkillRadar.jsx";
-import { profile } from "@/data/profile.js";
+import { profile } from "@/data/profile.ts";
 
 function StatBar({ label, value, delay }) {
   return (
@@ -23,7 +23,9 @@ function StatBar({ label, value, delay }) {
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay }}
         />
       </div>
-      <span className="w-[28px] text-right font-cyberpunk text-[13px] text-[#FCEE0A]">{value}</span>
+      <span className="w-[28px] text-right font-cyberpunk text-[13px] text-[#FCEE0A]">
+        {value}
+      </span>
     </div>
   );
 }
@@ -37,7 +39,12 @@ export default function Skills() {
         </Reveal>
         <div className="flex flex-col gap-4">
           {profile.attributes.map((a, i) => (
-            <StatBar key={a.label} label={a.label} value={a.value} delay={0.05 * i} />
+            <StatBar
+              key={a.label}
+              label={a.label}
+              value={a.value}
+              delay={0.05 * i}
+            />
           ))}
         </div>
       </div>
@@ -53,7 +60,11 @@ export default function Skills() {
               {items.map((it) => (
                 <motion.span
                   key={it}
-                  whileHover={{ y: -3, borderColor: "#FCEE0A", color: "#FCEE0A" }}
+                  whileHover={{
+                    y: -3,
+                    borderColor: "#FCEE0A",
+                    color: "#FCEE0A",
+                  }}
                   className="cursor-default border border-[#39c4b6]/40 bg-black/30 px-2 py-1 font-text text-[12px] text-[#bcd6d0]"
                 >
                   {it}

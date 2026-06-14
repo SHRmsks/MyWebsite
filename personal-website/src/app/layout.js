@@ -2,7 +2,7 @@ import "./global.css";
 import Main  from "./page.js";
 export const metadata = {
   title: "Haoran's Website",
-  description: "Personal Website made with nextJS",
+  description: "Haoran's Personal Website",
 };
 
 export default function RootLayout({children }) {

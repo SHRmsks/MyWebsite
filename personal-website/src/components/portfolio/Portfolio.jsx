@@ -15,7 +15,7 @@ import Skills from "./Skills.jsx";
 import Projects from "./Projects.jsx";
 import Guestbook from "./Guestbook.jsx";
 import Contact from "./Contact.jsx";
-import { profile } from "@/data/profile.js";
+import { profile } from "@/data/profile.ts";
 
 export default function Portfolio({ canPlayGame = false, onEnterGame }) {
   return (

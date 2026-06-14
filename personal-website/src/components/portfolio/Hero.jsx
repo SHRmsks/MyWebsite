@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import MatrixEffect from "@/utility/randomText.js";
-import { profile } from "@/data/profile.js";
+import { profile } from "@/data/profile.ts";
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -111,6 +111,8 @@ export default function Hero({ canPlayGame, onEnterGame }) {
 export function smoothScroll(id) {
   return (e) => {
     e.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 }

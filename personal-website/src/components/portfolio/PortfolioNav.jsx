@@ -3,7 +3,7 @@
 // highlight. No routes/URL segments: clicking scrolls to the section in place.
 
 import React, { useEffect, useState } from "react";
-import { profile } from "@/data/profile.js";
+import { profile } from "@/data/profile.ts";
 
 const SECTIONS = [
   ["home", "Home"],
