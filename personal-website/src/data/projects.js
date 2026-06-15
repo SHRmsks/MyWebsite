@@ -9,7 +9,7 @@ export const projects = [
     id: "RichTextEditor",
     name: "Custom Rich Text Editor 2026",
     framework: "WebASM(C),WebGL",
-    icon: "/webasm.svg",
+    icon: "/WebAsm.svg",
     intro:
       "A custom rich text editor that is built from scratch with WebAssembly and WebGL. Manually implemented layout and rendering engine based on Piece Table and Red-Black Tree, with GPU-accelerated text rendering.",
     demos: [
@@ -33,7 +33,7 @@ export const projects = [
     id: "mygit",
     name: "mygit — Distributed VCS 2026",
     framework: "C · Golang · gRPC",
-    icon: "/C.svg",
+    icon: "/c.svg",
     intro:
       "A custom distributed version-control system with Content-Defined Chunking + Fast Gear Hash. ~7× faster than Git on large binary edits (0.19s vs 8.77s), 50% less disk via Merkle-tree manifest indexing and session packfiles.",
     demos: [
@@ -89,7 +89,7 @@ export const projects = [
     id: "micros",
     name: "MICROS — Kernel & FS 2025",
     framework: "C · x86 Assembly",
-    icon: "/C.svg",
+    icon: "/c.svg",
     intro:
       "A preemptive rate-monotonic scheduler in x86 protected mode with low-level context switching, plus a standalone persistent filesystem talking directly to ATA/IDE controller I/O ports with custom IOCTL interfaces for Ring-3. Currently private and not avaible for demo.",
     skills: {

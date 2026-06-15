@@ -15,9 +15,10 @@ next
 personal-website
 # testing
 /coverage
-
+../.DS_Store
 # next.js
 /.next/
+/.claude
 /out/
 
 # production
