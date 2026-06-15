@@ -27,6 +27,9 @@ export function detectDemoKind(demo) {
 export default function ProjectDemo({ demo, title = "demo" }) {
   const kind = detectDemoKind(demo);
 
+  // Nothing provided -> render nothing (no empty boxes, no layout shift).
+  if (kind === "none") return null;
+
   if (kind === "video") {
     return (
       <div className="relative w-full overflow-hidden rounded-md border border-[#39c4b6]/40 bg-black">

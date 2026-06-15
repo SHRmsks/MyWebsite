@@ -82,6 +82,24 @@ export class Player {
     v.z += (this._desired.z - v.z) * lerp;
   }
 
+  /**
+   * Hard-clamp the horizontal position inside the room. Radius-aware so your whole
+   * body stays in, and bounce-free (we just stop the position + kill inward speed).
+   */
+  clampToBounds(bounds) {
+    const r = this.radius;
+    const p = this.body.position;
+    const v = this.body.velocity;
+    const minX = bounds.min.x + r;
+    const maxX = bounds.max.x - r;
+    const minZ = bounds.min.z + r;
+    const maxZ = bounds.max.z - r;
+    if (p.x < minX) { p.x = minX; if (v.x < 0) v.x = 0; }
+    else if (p.x > maxX) { p.x = maxX; if (v.x > 0) v.x = 0; }
+    if (p.z < minZ) { p.z = minZ; if (v.z < 0) v.z = 0; }
+    else if (p.z > maxZ) { p.z = maxZ; if (v.z > 0) v.z = 0; }
+  }
+
   dispose() {
     this.world.removeBody(this.body);
   }

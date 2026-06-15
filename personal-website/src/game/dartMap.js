@@ -4,10 +4,11 @@ import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import { addFootstep, loadFootsteps, hasThrown } from "@/lib/guestbook.js"; // Added hasThrown import
 
 const W = 3.4;
-const H = (W * 9) / 16;
-const PIN = new THREE.Color(0xfcee0a);
 const SVG_W = 1009.673;
 const SVG_H = 665.963;
+// Automatically calculate perfect Height so the 3D plane matches the SVG exactly
+const H = W * (SVG_H / SVG_W);
+const PIN = new THREE.Color(0xfcee0a);
 
 function svgToLocal(x, y) {
   return [(x / SVG_W - 0.5) * W, (0.5 - y / SVG_H) * H];
@@ -87,7 +88,7 @@ export class DartMap {
     this._mat = new THREE.MeshStandardMaterial({
       color: 0x0a141c,
       emissive: 0x0a141c,
-      roughness: 1.0, // <-- FIX: Increased to 1.0 to eliminate the pink point-light specular reflection
+      roughness: 1.0, //
       side: THREE.DoubleSide,
     });
     this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(W, H), this._mat);
@@ -140,7 +141,7 @@ export class DartMap {
     );
     this.root.rotation.y = Math.PI / 2;
     this._baseY = this.root.position.y;
-    this._renderPins(loadFootsteps());
+    loadFootsteps().then((d) => this._renderPins(d));
   }
 
   _renderPins(footsteps) {
@@ -171,7 +172,7 @@ export class DartMap {
     };
   }
 
-  throwAt(camera, hit) {
+  throwAt(camera, hit, onLandCallback) {
     if (hasThrown() || this._isThrowing) return; // Prevent multiple throws
     this._isThrowing = true;
 
@@ -188,11 +189,27 @@ export class DartMap {
       t: 0,
       landed: false,
       onLand: () => {
-        const fs = addFootstep({ name: "Guest", x: hit.x, y: hit.y });
-        if (fs) this._addPin(fs.x, fs.y, true);
-        this._isThrowing = false; // Reset lock
+        this._pendingDartMesh = dart;
+        if (onLandCallback) onLandCallback(hit.x, hit.y);
       },
     });
+  }
+
+  async confirmPendingPin(name, x, y) {
+    const fs = await addFootstep({ name: name || "Anonymous", x, y });
+    if (fs) {
+      this._addPin(fs.x, fs.y, true);
+    }
+    this._pendingDartMesh = null;
+    this._isThrowing = false; // Reset lock
+  }
+
+  cancelPendingDart() {
+    if (this._pendingDartMesh) {
+      this._pendingDartMesh.parent?.remove(this._pendingDartMesh);
+      this._pendingDartMesh = null;
+    }
+    this._isThrowing = false; // Allow them to throw again
   }
 
   _makeDart() {
@@ -218,7 +235,7 @@ export class DartMap {
 
   update(dt) {
     this._t += dt;
-    this.root.position.y = this._baseY + Math.sin(this._t * 1.2) * 0.05;
+    // (Map stays perfectly still — the old gentle float read as "bouncing".)
     this._pins.children.forEach((p) => {
       if (p.userData.fresh > 0) {
         p.userData.fresh -= dt;

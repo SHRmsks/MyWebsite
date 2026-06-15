@@ -34,7 +34,12 @@ function ProjectNode({ project, side, index, onOpen }) {
         initial={{ scale: 0, opacity: 0 }}
         whileInView={{ scale: 1, opacity: 1 }}
         viewport={{ once: true, amount: 0.6 }}
-        transition={{ type: "spring", stiffness: 200, damping: 16, delay: index * 0.05 }}
+        transition={{
+          type: "spring",
+          stiffness: 200,
+          damping: 16,
+          delay: index * 0.05,
+        }}
         whileHover={{ scale: 1.12 }}
         className="group relative z-10 grid h-[78px] w-[78px] place-items-center"
         aria-label={`Open ${project.name}`}
@@ -54,7 +59,9 @@ function ProjectNode({ project, side, index, onOpen }) {
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={project.icon} alt="" className="h-9 w-9 object-contain" />
           ) : (
-            <span className="font-cyberpunk text-[20px] text-[#39c4b6]">{index + 1}</span>
+            <span className="font-cyberpunk text-[20px] text-[#39c4b6]">
+              {index + 1}
+            </span>
           )}
         </span>
       </motion.button>
@@ -72,8 +79,12 @@ function ProjectNode({ project, side, index, onOpen }) {
         }`}
         onClick={onOpen}
       >
-        <h3 className="font-slant text-[22px] leading-tight text-[#e9fbff]">{project.name}</h3>
-        <p className="font-text text-[12px] tracking-[0.18em] text-[#39c4b6]">{project.framework}</p>
+        <h3 className="font-slant text-[22px] leading-tight text-[#e9fbff]">
+          {project.name}
+        </h3>
+        <p className="font-text text-[12px] tracking-[0.18em] text-[#39c4b6]">
+          {project.framework}
+        </p>
         <p className="mt-1 font-text text-[12px] leading-[1.6] text-[#9fb6b0]">
           {project.intro}
         </p>
@@ -90,6 +101,10 @@ export default function Projects() {
 
   return (
     <Section id="projects" index={4} title="Projects">
+      <p className="relative font-cyberpunk text-left text-[#FCEE0A] drop-shadow-[0_0_14px_rgba(252,238,10,0.35)] text-[20px] sm:text-[15px] ">
+        {" "}
+        Click in box for details{" "}
+      </p>
       <div className="relative mx-auto flex max-w-[820px] flex-col items-center gap-20 py-4">
         {/* central spine */}
         <motion.div
@@ -107,7 +122,12 @@ export default function Projects() {
             className="pointer-events-none absolute left-1/2 h-12 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-transparent via-[#FCEE0A] to-transparent blur-[1px]"
             initial={{ top: "-8%", opacity: 0 }}
             animate={{ top: ["-8%", "108%"], opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: "linear", delay }}
+            transition={{
+              duration: 3.2,
+              repeat: Infinity,
+              ease: "linear",
+              delay,
+            }}
           />
         ))}
         {projects.map((p, i) => (
@@ -122,7 +142,9 @@ export default function Projects() {
       </div>
 
       <AnimatePresence>
-        {active && <ProjectModal project={active} onClose={() => setActive(null)} />}
+        {active && (
+          <ProjectModal project={active} onClose={() => setActive(null)} />
+        )}
       </AnimatePresence>
     </Section>
   );

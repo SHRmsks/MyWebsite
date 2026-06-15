@@ -11,7 +11,12 @@ import { loadFootsteps, addFootstep } from "@/lib/guestbook.js";
 
 function Dart() {
   return (
-    <svg width="20" height="46" viewBox="0 0 20 46" className="drop-shadow-[0_0_8px_#FCEE0A]">
+    <svg
+      width="20"
+      height="46"
+      viewBox="0 0 20 46"
+      className="drop-shadow-[0_0_8px_#FCEE0A]"
+    >
       {/* flights */}
       <path d="M10 0 L3 8 L10 6 L17 8 Z" fill="#39c4b6" />
       {/* shaft */}
@@ -24,7 +29,8 @@ function Dart() {
 
 function Pin({ name, fresh }) {
   return (
-    <div className="group relative -translate-x-1/2 -translate-y-full">
+    // FIX: Changed -translate-y-full to -translate-y-1/2 so the dot drops dead-center on the coordinate
+    <div className="group relative -translate-x-1/2 -translate-y-1/2">
       <motion.div
         initial={fresh ? { scale: 0, y: -10 } : false}
         animate={{ scale: 1, y: 0 }}
@@ -32,9 +38,9 @@ function Pin({ name, fresh }) {
         className="relative"
       >
         {/* pulse ring */}
-        <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-[#FCEE0A]/60" />
+        <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-[#FCEE0A]/60" />
         {/* marker diamond */}
-        <span className="block h-[10px] w-[10px] rotate-45 border border-[#05070d] bg-[#FCEE0A] shadow-[0_0_8px_#FCEE0A]" />
+        <span className="block h-[6px] w-[6px] rotate-45 border border-[#05070d] bg-[#FCEE0A] shadow-[0_0_8px_#FCEE0A]" />
       </motion.div>
       {/* name label on hover */}
       <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded border border-[#39c4b6]/50 bg-[#05070d]/90 px-2 py-[2px] font-text text-[10px] text-[#cfeae5] opacity-0 transition-opacity group-hover:opacity-100">
@@ -57,21 +63,36 @@ export default function Guestbook() {
   const [name, setName] = useState("");
 
   // Load existing footsteps once on mount.
-  useEffect(() => setFootsteps(loadFootsteps()), []);
+  useEffect(() => {
+    loadFootsteps().then((data) => {
+      setFootsteps(data);
+    });
+  }, []);
 
+  // Lazy-fetch the world map only when the section scrolls into view.
   // Lazy-fetch the world map only when the section scrolls into view.
   useEffect(() => {
     if (!inView || svg) return;
     fetch("/world.svg")
       .then((r) => r.text())
       .then((raw) => {
-        const sized = raw
-          .replace(/<svg/, '<svg preserveAspectRatio="xMidYMid meet" width="100%" height="100%"')
-          .replace(/width="[\d.]+(px)?"/, "")
-          .replace(/height="[\d.]+(px)?"/, "");
-        setSvg(sized);
+        // Use DOMParser to safely edit ONLY the root <svg> tag, preserving all internal paths
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(raw, "image/svg+xml");
+        const svgEl = doc.querySelector("svg");
+
+        if (svgEl) {
+          // Force perfect 3D-engine mapping proportions
+          svgEl.setAttribute("viewBox", "0 0 1009.673 665.963");
+          svgEl.setAttribute("preserveAspectRatio", "none");
+          svgEl.setAttribute("width", "100%");
+          svgEl.setAttribute("height", "100%");
+          setSvg(svgEl.outerHTML);
+        } else {
+          setSvg(raw);
+        }
       })
-      .catch(() => setSvg("<!-- map unavailable -->"));
+      .catch(() => setSvg(""));
   }, [inView, svg]);
 
   const throwDart = (e) => {
@@ -89,9 +110,13 @@ export default function Guestbook() {
     window.setTimeout(() => setLanded(true), 450);
   };
 
-  const plant = (e) => {
+  const plant = async (e) => {
     e.preventDefault();
-    const fs = addFootstep({ name: name.trim() || "Anonymous", x: pending.x, y: pending.y });
+    const fs = await addFootstep({
+      name: name.trim() || "Anonymous",
+      x: pending.x,
+      y: pending.y,
+    });
     setFootsteps((prev) => [...prev, { ...fs, _fresh: true }]);
     setPending(null);
     setName("");
@@ -106,11 +131,12 @@ export default function Guestbook() {
     <Section id="guestbook" index={5} title="Sign In">
       <div ref={sectionRef}>
         <p className="mb-2 font-text text-[14px] text-[#bcd6d0]">
-          Throw a dart at the map and plant your flag — leave a footstep so I know you
-          stopped by.
+          Throw a dart at the map and plant your flag — leave a footstep so I
+          know you stopped by.
         </p>
         <p className="mb-6 font-cyberpunk text-[13px] text-[#FCEE0A]">
-          ◈ {footsteps.length} explorer{footsteps.length === 1 ? "" : "s"} have left their mark
+          ◈ {footsteps.length} explorer{footsteps.length === 1 ? "" : "s"} have
+          left their mark
         </p>
 
         <div
@@ -118,7 +144,10 @@ export default function Guestbook() {
           onClick={throwDart}
           onTouchStart={throwDart}
           className="relative aspect-[16/9] w-full cursor-crosshair overflow-hidden rounded-md border border-[#39c4b6]/40 bg-[#070d14] [&_path]:fill-[#0e1c26] [&_path]:stroke-[#2ea3ad] [&_svg]:h-full [&_svg]:w-full"
-          style={{ boxShadow: "inset 0 0 60px rgba(57,196,182,0.15)" }}
+          style={{
+            aspectRatio: "1009.673 / 665.963", // Exact SVG aspect ratio!
+            boxShadow: "inset 0 0 60px rgba(57,196,182,0.15)",
+          }}
         >
           {/* neon world map */}
           {svg ? (
@@ -133,11 +162,16 @@ export default function Guestbook() {
           )}
 
           {/* saved footsteps */}
-          {footsteps.map((f) => (
-            <div key={f.id} className="absolute" style={{ left: `${f.x}%`, top: `${f.y}%` }}>
-              <Pin name={f.name} fresh={f._fresh} />
-            </div>
-          ))}
+          {footsteps.length > 0 &&
+            footsteps.map((f) => (
+              <div
+                key={f.id}
+                className="absolute"
+                style={{ left: `${f.x}%`, top: `${f.y}%` }}
+              >
+                <Pin name={f.name} fresh={f._fresh} />
+              </div>
+            ))}
 
           {/* in-flight / landed dart */}
           <AnimatePresence>
@@ -190,9 +224,6 @@ export default function Guestbook() {
             </form>
           )}
         </div>
-        <p className="mt-3 font-text text-[11px] text-[#5f7780]">
-          (Footsteps are saved in your browser for now — a shared world guestbook is coming.)
-        </p>
       </div>
     </Section>
   );

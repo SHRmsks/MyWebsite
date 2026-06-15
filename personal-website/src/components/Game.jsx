@@ -51,6 +51,10 @@ export default function Game({ mode = "desktop", onExit }) {
         onInteract={() => engineRef.current?.requestInteract()}
         onResume={() => engineRef.current?.requestLock()}
         onExit={onExit}
+        onConfirmDart={(name, x, y) =>
+          engineRef.current?.confirmDart(name, x, y)
+        }
+        onCancelDart={() => engineRef.current?.cancelDart()}
       />
     </div>
   );

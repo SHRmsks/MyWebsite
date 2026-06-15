@@ -22,7 +22,11 @@ export default function GameHUD({
   isMobile = false,
   onInteract,
   onResume,
+  dartX,
+  dartY,
   onExit,
+  onConfirmDart,
+  onCancelDart,
 }) {
   const [portrait, setPortrait] = useState(false);
 
@@ -94,6 +98,55 @@ export default function GameHUD({
           <HudButton onClick={onExit}>Enter Site →</HudButton>
         </div>
       </Overlay>
+    );
+  }
+  function DartNameForm({ dartX, dartY, onConfirm, onCancel }) {
+    const [val, setVal] = useState("");
+    return (
+      <Overlay>
+        <div
+          className="flex flex-col items-center gap-4 bg-[#05070d]/95 p-6 border border-[#FCEE0A]/60 rounded backdrop-blur-md"
+          onClick={(e) => e.stopPropagation()} // Prevent clicking through to the canvas
+        >
+          <p className="font-cyberpunk text-[#FCEE0A] text-[18px]">
+            DART PLANTED
+          </p>
+          <p className="font-text text-[#cfeae5] text-[13px]">
+            Leave your mark on the global map.
+          </p>
+          <input
+            autoFocus
+            value={val}
+            onChange={(e) => setVal(e.target.value)}
+            maxLength={24}
+            placeholder="Your name / country"
+            className="w-[220px] bg-transparent border border-[#39c4b6]/50 px-3 py-2 font-text text-[14px] text-[#cfeae5] outline-none focus:border-[#FCEE0A] transition-colors"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onConfirm(val, dartX, dartY);
+            }}
+          />
+          <div className="flex gap-4 mt-2">
+            <HudButton onClick={() => onConfirm(val, dartX, dartY)}>
+              Plant ◈
+            </HudButton>
+            <HudButton onClick={onCancel} variant="ghost">
+              Redo
+            </HudButton>
+          </div>
+        </div>
+      </Overlay>
+    );
+  }
+
+  // ---- Dart Landed (Name Entry) ----
+  if (phase === "dart_landed") {
+    return (
+      <DartNameForm
+        dartX={dartX}
+        dartY={dartY}
+        onConfirm={onConfirmDart}
+        onCancel={onCancelDart}
+      />
     );
   }
 
@@ -211,5 +264,43 @@ function HudButton({ children, onClick, variant = "solid" }) {
     <button onClick={onClick} className={`${base} ${styles}`}>
       {children}
     </button>
+  );
+}
+
+function DartNameForm({ dartX, dartY, onConfirm, onCancel }) {
+  const [val, setVal] = useState("");
+  return (
+    <Overlay>
+      <div
+        className="flex flex-col items-center gap-4 bg-[#05070d]/95 p-6 border border-[#FCEE0A]/60 rounded backdrop-blur-md"
+        onClick={(e) => e.stopPropagation()} // Prevent clicking through to the canvas
+      >
+        <p className="font-cyberpunk text-[#FCEE0A] text-[18px]">
+          DART PLANTED
+        </p>
+        <p className="font-text text-[#cfeae5] text-[13px]">
+          Leave your mark on the global map.
+        </p>
+        <input
+          autoFocus
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          maxLength={24}
+          placeholder="Your name / country"
+          className="w-[220px] bg-transparent border border-[#39c4b6]/50 px-3 py-2 font-text text-[14px] text-[#cfeae5] outline-none focus:border-[#FCEE0A] transition-colors"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onConfirm(val, dartX, dartY);
+          }}
+        />
+        <div className="flex gap-4 mt-2">
+          <HudButton onClick={() => onConfirm(val, dartX, dartY)}>
+            Plant ◈
+          </HudButton>
+          <HudButton onClick={onCancel} variant="ghost">
+            Redo
+          </HudButton>
+        </div>
+      </div>
+    </Overlay>
   );
 }

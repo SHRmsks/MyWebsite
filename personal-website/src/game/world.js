@@ -9,7 +9,7 @@ import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
 const WALL_THICKNESS = 0.5; // metres; thick enough that fast movement can't tunnel
-const WALL_INSET = 0.15; // pull walls slightly inward so we stop before clipping art
+const WALL_INSET = 0.5; // pull walls slightly inward so we stop before clipping art
 
 /** Create the physics world with sane defaults for an FPS walk-around. */
 export function createPhysicsWorld() {

@@ -69,6 +69,9 @@ export class Cat {
 
   async load(pos, bounds, floor) {
     this._floor = floor;
+    // The room floor is flat; use the known floor height so the fox is always
+    // planted on it (raycasting the whole room snapped it onto rugs/ledges).
+    this._groundY = bounds && bounds.floorY != null ? bounds.floorY : 0;
 
     const gltf = await loadGLTF(MODEL_URL);
     this.model = gltf.scene;
@@ -213,15 +216,8 @@ export class Cat {
   }
 
   _snapToFloor() {
-    if (!this._floor) return;
-    this._rayOrigin.set(
-      this.root.position.x,
-      this.root.position.y + 0.8,
-      this.root.position.z,
-    );
-    this._floorRay.set(this._rayOrigin, DOWN);
-    const hits = this._floorRay.intersectObject(this._floor, true);
-    if (hits.length) this.root.position.y = hits[0].point.y;
+    // Flat floor — just keep the fox planted at the known floor height.
+    if (this._groundY != null) this.root.position.y = this._groundY;
   }
 
   _spawnHearts(n) {

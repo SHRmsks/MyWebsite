@@ -4,8 +4,11 @@
 
 import React, { useEffect } from "react";
 import { motion } from "motion/react";
-import ProjectDemo from "./ProjectDemo.jsx";
+import ProjectDemo, { detectDemoKind } from "./ProjectDemo.jsx";
 import { SKILL_AXES } from "@/data/projects.js";
+
+// Friendly heading for each demo block.
+const KIND_LABEL = { video: "Demo Video", embed: "Embedded Video", image: "Screenshot", link: "Link" };
 
 const PANEL_CLIP =
   "polygon(0 18px, 18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%)";
@@ -62,9 +65,27 @@ export default function ProjectModal({ project, onClose }) {
 
           <p className="mb-5 font-text text-[14px] leading-[1.7] text-[#bcd6d0]">{project.intro}</p>
 
-          <div className="mb-5">
-            <ProjectDemo demo={project.demo} title={project.name} />
-          </div>
+          {/* A project can supply any mix of video + embed + link at once
+              (project.demos[]), or a single project.demo. Missing kinds are
+              simply skipped — no empty boxes, no layout shift. */}
+          {(() => {
+            const demos = (project.demos || (project.demo ? [project.demo] : [])).filter(
+              (d) => detectDemoKind(d) !== "none"
+            );
+            if (demos.length === 0) return null;
+            return (
+              <div className="mb-5 flex flex-col gap-4">
+                {demos.map((d, i) => (
+                  <div key={i}>
+                    <p className="mb-1 font-text text-[10px] tracking-[0.25em] text-[#ff2d8d]">
+                      ▸ {KIND_LABEL[detectDemoKind(d)] || "Demo"}
+                    </p>
+                    <ProjectDemo demo={d} title={project.name} />
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {project.tags?.length > 0 && (
             <div className="mb-5 flex flex-wrap gap-2">

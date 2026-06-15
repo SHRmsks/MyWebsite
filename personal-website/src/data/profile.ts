@@ -1,22 +1,15 @@
-// profile.ts
-// Single source of truth for the "character sheet" — edit this to update the site.
-// No JSX here, just data, so it stays easy to read and change. Content is pulled
-// from Haoran's resume.
 
 export const profile = {
   name: "Haoran",
   fullName: "Haoran Su",
   handle: "SHRmsks",
-  title: "Full-Stack and Systems Engineer",
+  title: "Full-Stack and System Engineer",
   tagline: "Software Infra, OS, Distributed Sys, Applied ML",
-  location: "Boston, Ithaca, Shanghai, Nanjing",
+  location: "Nanjing, Boston, Shanghai, Ithaca",
   portrait: "/haoran.webp",
 
-  bio: `I'm Haoran — a Computer Science + Applied Math grad from Boston University (3.81 GPA, Dean's List, ICPC regional contestant), heading to Cornell for an M.Eng in CS.
-
-I build across the whole stack and all the way down: high-throughput WebSocket platforms and event-driven services on one end, and x86 kernels, schedulers and a custom distributed version-control system on the other. I've interned at ByteDance and ZTE, taught web dev to 80+ students, and run React/Next.js workshops for Hack4Impact.
-
-I care about performance, clean architecture, and interfaces that feel alive. Let's build something.`,
+  bio: `Glad you find me here. My name is Haoran — a Computer Science guy with Applied Math who recently graduated from Boston University.I will head to Cornell for an M.Eng in CS in Spring 2027. \n\nI have built across the multiple subfields and I am currenly focusing on learning and creating infrastructure and useful wheels.
+  My past projects and experiences have largely spanned on following: a custom distributed version-control system, a custom WebGL-based rich text editor, monotonic scheduler and file system in protected mode, and a full-stack AI platform experience in ZTE communication corporation plus mutiple instructor expeiences in Boston University and Hack4Impact Club.\n\nI care about performance, clean architecture, and interfaces and love build from scratch in my free timethat make me feel alive. If you are intereted, contact me and let's do some serious business🔥 .`,
 
   // Radar "attributes" — label + value out of 10.
   attributes: [
@@ -32,10 +25,10 @@ I care about performance, clean architecture, and interfaces that feel alive. Le
 
   // Grouped tech for the "arsenal" display.
   stack: {
-    Languages: ["C / C++", "Golang", "TypeScript", "Python", "Java", "Kotlin", "x86 ASM", "Bash"],
+    Languages: ["C","C++", "Golang", "TypeScript", "Python", "Java", "Kotlin", "x86 ASM", "Bash"],
     Frameworks: ["Next.js", "React", "FastAPI", "GraphQL", "Tailwind"],
     Data: ["PostgreSQL", "MongoDB", "Redis", "Kafka"],
-    Infra: ["AWS", "Docker", "Nginx", "Git", "Figma"],
+    Infra: ["AWS", "Docker", "Nginx", "Git", "Linux"],
   },
 
   education: [
@@ -59,9 +52,10 @@ I care about performance, clean architecture, and interfaces that feel alive. Le
 
   links: [
     { label: "GitHub", href: "https://github.com/SHRmsks", icon: "/github.svg" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/Suhaoran/", icon: null },
-    { label: "Website", href: "https://www.haoran.us", icon: null },
-    { label: "Email", href: "mailto:suhr08@bu.edu", icon: null },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/Suhaoran/", icon: "/linkedin.svg" },
+    { label: "Website", href: "https://www.haoran.us", icon: "/website.svg" },
+    { label: "Email", href: "mailto:shr1424456949@gmail.com", icon: "/email.svg" },
+    { label: "WeChat", href: "biblehamandluigi", icon: "/wechat.svg" }
   ],
 };
 

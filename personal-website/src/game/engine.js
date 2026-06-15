@@ -14,6 +14,7 @@ import { Arm } from "./arm.js";
 import { Cat } from "./cat.js";
 import { Terminal } from "./terminal.js";
 import { DartMap } from "./dartMap.js";
+import { VideoWall } from "./videoWall.js";
 import { evaluatePetTarget } from "./interaction.js";
 import { createDesktopControls } from "./controls/desktopControls.js";
 import { createMobileControls } from "./controls/mobileControls.js";
@@ -82,6 +83,10 @@ export class GameEngine {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Tone mapping tames the neon highlights so textures (the fox!) keep their
+    // colour instead of blowing out to white.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
     this.container.appendChild(renderer.domElement);
     this.renderer = renderer;
     this.canvas = renderer.domElement;
@@ -101,17 +106,18 @@ export class GameEngine {
     camera.rotation.order = "YXZ";
     scene.add(camera); // so the first-person arm (child of camera) renders
 
-    // Moody neon lighting — but bright enough to actually see the pet and room.
-    scene.add(new THREE.AmbientLight(0x9fb2c4, 1.1));
-    const hemi = new THREE.HemisphereLight(0x9fe9ff, 0x20141f, 0.9);
+    // Moody neon lighting — balanced for ACES tone mapping so textures (the fox!)
+    // keep their colour instead of blowing out to white.
+    scene.add(new THREE.AmbientLight(0x9fb2c4, 0.8));
+    const hemi = new THREE.HemisphereLight(0x9fe9ff, 0x20141f, 0.55);
     scene.add(hemi);
     // Neon accents, repositioned for the now human-scaled (~2.5m) room.
-    const cyan = new THREE.PointLight(0x39c4b6, 6, 9, 2);
+    const cyan = new THREE.PointLight(0x39c4b6, 4, 9, 2);
     cyan.position.set(1.2, 1.9, 0.8);
     scene.add(cyan);
 
     // A soft fill that rides with the player so whatever you face is lit.
-    const playerLight = new THREE.PointLight(0xcfeaff, 3.2, 7, 1.5);
+    const playerLight = new THREE.PointLight(0xcfeaff, 2.2, 7, 1.6);
     playerLight.position.set(0, 0.25, -0.2);
     camera.add(playerLight);
 
@@ -146,6 +152,7 @@ export class GameEngine {
       this.scene.add(this.room);
 
       const bounds = addRoomColliders(this.world, this.room, this.envMat);
+      this._bounds = bounds;
       this.player = new Player(this.world, bounds, this.playerMat);
 
       // Cat sits on the floor, centred and a short walk in front of the spawn so
@@ -181,6 +188,19 @@ export class GameEngine {
         new THREE.Vector3(bounds.center.x, bounds.min.y, bounds.center.z),
       );
       this.scene.add(this.terminal.root);
+
+      // Looping cyberpunk video screen on the back (+Z) wall, shifted toward +X so
+      // it doesn't cross the dart map in the back-left corner (drop /public/wall.mp4).
+      this.videoWall = new VideoWall("/wall.mp4");
+      this.videoWall.place(
+        new THREE.Vector3(
+          bounds.center.x + 0.5,
+          bounds.center.y + 0.25,
+          bounds.max.z - 0.12,
+        ),
+        Math.PI,
+      );
+      this.scene.add(this.videoWall.root);
 
       this._setState({ phase: "loading", progress: 1 });
       this._initControls();
@@ -252,9 +272,10 @@ export class GameEngine {
     this.input.lookDelta.y = 0;
     this.camera.rotation.set(this.pitch, this.yaw, 0);
 
-    // 2) Move the player (velocity-based; physics resolves wall collisions).
+    // 2) Move the player, then hard-clamp inside the room (radius-aware, no bounce).
     this.player.update(this.input.move, this.yaw, dt);
     this.world.step(1 / 60, dt, 5);
+    this.player.clampToBounds(this._bounds);
 
     // 3) Camera rides on the player body at eye height.
     this.player.getEyePosition(this._eye);
@@ -295,8 +316,14 @@ export class GameEngine {
     // 5) Interaction (edge-triggered).
     if (this.input.interactRequested) {
       this.input.interactRequested = false;
-      if (kind === "dart") this.dartMap.throwAt(this.camera, dartHit);
-      else if (kind === "access") this._portal();
+      if (kind === "dart") {
+        this.dartMap.throwAt(this.camera, dartHit, (x, y) => {
+          this._setState({ phase: "dart_landed", dartX: x, dartY: y });
+          if (typeof document !== "undefined" && document.pointerLockElement) {
+            document.exitPointerLock(); // Free the mouse so they can click the input!
+          }
+        });
+      } else if (kind === "access") this._portal();
       else if (kind === "pet") this.arm.pet();
     }
 
@@ -309,6 +336,7 @@ export class GameEngine {
     this.cat.update(dt);
     this.terminal?.update(dt);
     this.dartMap?.update(dt);
+    this.videoWall?.update(dt);
 
     this.renderer.render(this.scene, this.camera);
   }
@@ -317,6 +345,17 @@ export class GameEngine {
     if (!this.disposed) this.onState(partial);
   }
 
+  confirmDart(name, x, y) {
+    this.dartMap?.confirmPendingPin(name, x, y);
+    this._setState({ phase: "ready" });
+    this.requestLock(); // Auto-lock mouse back to the game
+  }
+
+  cancelDart() {
+    this.dartMap?.cancelPendingDart();
+    this._setState({ phase: "ready" });
+    this.requestLock(); // Auto-lock mouse back to the game
+  }
   dispose() {
     this.disposed = true;
     cancelAnimationFrame(this._raf);
@@ -327,6 +366,7 @@ export class GameEngine {
     this.cat?.dispose();
     this.terminal?.dispose();
     this.dartMap?.dispose();
+    this.videoWall?.dispose();
     this.player?.dispose();
 
     // Dispose all GPU resources still in the scene.
@@ -344,6 +384,7 @@ export class GameEngine {
     this.renderer?.dispose();
     if (this.canvas?.parentNode)
       this.canvas.parentNode.removeChild(this.canvas);
+
     disposeLoaders();
   }
 }

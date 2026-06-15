@@ -66,8 +66,7 @@ const MatrixEffect = ({
     },
     matrix: {
       opacity: [1, 0.9, 0.8, 0.9, 1],
-      y: [-1, 0, 1],
-      x: [0, -0.5, 0.5],
+
       textShadow: [
         "2px 0px 2px rgba(0, 255, 0, 0.7)",
         "-2px 0px 2px rgba(255, 0, 0, 0.7)",
