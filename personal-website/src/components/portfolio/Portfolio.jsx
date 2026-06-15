@@ -44,13 +44,6 @@ export default function Portfolio({ canPlayGame = false, onEnterGame }) {
         <Guestbook />
         <Contact />
       </main>
-
-      <footer className="relative z-10 border-t border-[#39c4b6]/15 px-5 py-8 text-center">
-        <p className="font-text text-[12px] tracking-[0.2em] text-[#5f7780]">
-          © {new Date().getFullYear()} {profile.name} · built with Next.js ·
-          Three.js · Tailwind
-        </p>
-      </footer>
     </div>
   );
 }
