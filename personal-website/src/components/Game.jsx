@@ -15,7 +15,7 @@ export default function Game({ mode = "desktop", onExit }) {
     if (mode !== "mobile") return;
     const FS = () => {
       const doc = window.document.documentElement;
-      const reqFS =
+      const requestFS =
         doc.requestFullscreen ||
         doc.webkitRequestFullscreen ||
         doc.msRequestFullscreen;
@@ -26,7 +26,7 @@ export default function Game({ mode = "desktop", onExit }) {
       }
     };
     window.addEventListener("touchstart", FS, { once: true });
-    window.addEventListener("click", goFullScreen, { once: true });
+    window.addEventListener("click", FS, { once: true });
     return () => {
       window.removeEventListener("touchstart", goFullScreen);
       window.removeEventListener("click", goFullScreen);
