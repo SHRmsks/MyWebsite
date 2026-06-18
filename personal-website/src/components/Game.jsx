@@ -19,8 +19,7 @@ export default function Game({ mode = "desktop", onExit }) {
           doc.webkitRequestFullscreen ||
           doc.msRequestFullscreen;
 
-        const isFullscreen =
-          document.fullscreenElement || document.webkitFullscreenElement;
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
 
         // Enter fullscreen on first tap
         if (requestFS && !isFullscreen) {
@@ -32,40 +31,29 @@ export default function Game({ mode = "desktop", onExit }) {
       } catch (err) {}
 
       // Once fired, remove the listeners immediately so it doesn't run on every single tap
-      window.removeEventListener("touchend", handleInteraction, {
-        capture: true,
-      });
+      window.removeEventListener("touchend", handleInteraction, { capture: true });
       window.removeEventListener("click", handleInteraction, { capture: true });
     };
 
-    // THE FIX: { capture: true } catches the tap from the top down,
+    // THE FIX: { capture: true } catches the tap from the top down, 
     // BEFORE the joystick (nipplejs) can swallow the event!
-    window.addEventListener("touchend", handleInteraction, {
-      capture: true,
-      passive: true,
-    });
-    window.addEventListener("click", handleInteraction, {
-      capture: true,
-      passive: true,
-    });
+    window.addEventListener("touchend", handleInteraction, { capture: true, passive: true });
+    window.addEventListener("click", handleInteraction, { capture: true, passive: true });
 
     // CLEANUP: explicitly exit fullscreen when returning to Main
     return () => {
-      window.removeEventListener("touchend", handleInteraction, {
-        capture: true,
-      });
+      window.removeEventListener("touchend", handleInteraction, { capture: true });
       window.removeEventListener("click", handleInteraction, { capture: true });
 
       try {
-        const isFullscreen =
-          document.fullscreenElement || document.webkitFullscreenElement;
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
         // If we are still in fullscreen when leaving the game, force it to exit
         if (isFullscreen) {
-          const exitFS =
-            document.exitFullscreen ||
-            document.webkitExitFullscreen ||
+          const exitFS = 
+            document.exitFullscreen || 
+            document.webkitExitFullscreen || 
             document.msExitFullscreen;
-
+            
           if (exitFS) {
             const promise = exitFS.call(document);
             if (promise && promise.catch) promise.catch(() => {});
