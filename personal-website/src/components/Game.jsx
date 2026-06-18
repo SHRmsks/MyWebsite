@@ -12,6 +12,28 @@ export default function Game({ mode = "desktop", onExit }) {
   const [hud, setHud] = useState({ phase: "loading", progress: 0 });
 
   useEffect(() => {
+    if (mode !== "mobile") return;
+    const FS = () => {
+      const doc = window.document.documentElement;
+      const reqFS =
+        doc.requestFullscreen ||
+        doc.webkitRequestFullscreen ||
+        doc.msRequestFullscreen;
+      if (requestFS && !document.fullscreenElement) {
+        requestFS.call(doc).catch((err) => {
+          console.warn("Fullscreen request denied or not supported", err);
+        });
+      }
+    };
+    window.addEventListener("touchstart", FS, { once: true });
+    window.addEventListener("click", goFullScreen, { once: true });
+    return () => {
+      window.removeEventListener("touchstart", goFullScreen);
+      window.removeEventListener("click", goFullScreen);
+    };
+  }, [mode]);
+
+  useEffect(() => {
     if (!containerRef.current) return;
     let cancelled = false;
     // Import the engine (three + cannon + nipplejs) only in the browser. This

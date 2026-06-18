@@ -3,8 +3,6 @@ import React, { useEffect, useRef } from "react";
 
 const CYAN = "#05d9e8";
 const YELLOW = "#FCEE0A";
-const PINK = "#ff2d8d";
-const GRID_COLOR = "rgba(57, 196, 182, 0.1)";
 
 export default function CyberBackground() {
   const canvasRef = useRef(null);
@@ -24,17 +22,24 @@ export default function CyberBackground() {
     const pillars = [];
     const NUM_PILLARS = 25;
     const hexChars =
-      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおかきくけこさしすせそたちゆよらりるれろわをん你反复问哦飞机无法俄界";
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZあいうえおかきくけこさしすせそたちゆよらりるれろわをんアイウエオカキクケニヌネノハヒフヘホマミムメモヤユヨラリ你反复问哦飞机无法俄界";
 
     // --- 3. KERNEL TELEMETRY LOGS ---
     const termLogs = [
-      "[OK] ALLOC struct node wait_nodes[10]",
-      "[OK] INIT mygit_chunk_def_hash",
-      "[WARN] GO_SLICE_HEADER: 24_BYTES",
-      "[SYS] std::priority_queue // MAX_HEAP",
-      "[OK] MOUNT CUSTOM_FS RING_3",
-      "[SYS] BYPASS_SYSCALL_OVERRIDE",
-      "[OK] LOAD MICROS_MONOTONIC_SCHEDULER",
+      "[SYS] Initiating Neural Handshake...",
+      "[OK] Synaptic Interface Locked",
+      "[경고] 신경 피드백 루프 감지",
+      "[AUTH] Bypassing Cortical ICE",
+      "[ОШИБКА] Отказ биометрической проверки",
+      "[OVERRIDE] Spoofing Retinal Signatures...",
+      "[ERFOLG] Firewall-Verschlüsselung gebrochen",
+      "[OK] 数据库最高权限已获取",
+      "[CRIT] TRACE PROGRAM INITIATED",
+      "[OK] 痛覚レセプターを強制無効化",
+      "[SYS] Adrenaline Injectors Primed",
+      "[警告] サブネットの隔離が開始されました",
+      "[SYS] Downloading Muscle-Memory Construct",
+      "[완료] 동기화율 99.8%",
     ];
     let currentLog = 0;
     let lastLogTime = 0;
@@ -236,7 +241,7 @@ export default function CyberBackground() {
       // 5. Cyan Memory Logs Opacity: dropped to 25% (0.25)
       ctx.fillStyle = "rgba(57, 196, 182, 0.25)";
       ctx.fillText(
-        `MEM_PTR: 0x${(Math.random() * 0xffffffffff).toString(16).toUpperCase()}`,
+        `Current Pointer: 0x${(Math.random() * 0xffffffffff).toString(16).toUpperCase()}`,
         logX,
         logY + 40,
       );
