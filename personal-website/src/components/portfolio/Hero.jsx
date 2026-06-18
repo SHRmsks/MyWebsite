@@ -83,7 +83,7 @@ export default function Hero({ canPlayGame, onEnterGame }) {
             onClick={onEnterGame}
             className="rounded-sm border border-[#ff2d8d] px-6 py-3 font-cyberpunk text-[15px] text-[#ff2d8d] transition hover:bg-[#ff2d8d]/10"
           >
-            ▶ Launch Game
+            Launch Game ►
           </button>
         )}
       </motion.div>

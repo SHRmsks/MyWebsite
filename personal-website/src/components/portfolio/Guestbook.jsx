@@ -27,7 +27,11 @@ function Dart() {
   );
 }
 
-function Pin({ name, fresh }) {
+function Pin({ name, fresh, is_owner }) {
+  const pulseRing = is_owner ? "bg-[#00ff00]/60" : "bg-[#FCEE0A]/60";
+  const markerColor = is_owner
+    ? `bg-[#00ff00] shadow-[0_0_8px_#00ff00]`
+    : `bg-[#FCEE0A] shadow-[0_0_8px_#FCEE0A]`;
   return (
     // FIX: Changed -translate-y-full to -translate-y-1/2 so the dot drops dead-center on the coordinate
     <div className="group relative -translate-x-1/2 -translate-y-1/2">
@@ -38,9 +42,13 @@ function Pin({ name, fresh }) {
         className="relative"
       >
         {/* pulse ring */}
-        <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-[#FCEE0A]/60" />
+        <span
+          className={`absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full ${pulseRing}`}
+        />
         {/* marker diamond */}
-        <span className="block h-[6px] w-[6px] rotate-45 border border-[#05070d] bg-[#FCEE0A] shadow-[0_0_8px_#FCEE0A]" />
+        <span
+          className={`block h-[6px] w-[6px] rotate-45 border border-[#05070d] ${markerColor}`}
+        />
       </motion.div>
       {/* name label on hover */}
       <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded border border-[#39c4b6]/50 bg-[#05070d]/90 px-2 py-[2px] font-text text-[10px] text-[#cfeae5] opacity-0 transition-opacity group-hover:opacity-100">
@@ -130,13 +138,12 @@ export default function Guestbook() {
   return (
     <Section id="guestbook" index={5} title="Sign In">
       <div ref={sectionRef}>
-        <p className="mb-2 font-text text-[14px] text-[#bcd6d0]">
-          Throw a dart at the map and plant your flag — leave a footstep so I
-          know you stopped by.
+        <p className="mb-2 font-cyberpunk text-[14px] text-[#bcd6d0]">
+          Establishing connections from the World ...
         </p>
-        <p className="mb-6 font-cyberpunk text-[13px] text-[#FCEE0A]">
-          ◈ {footsteps.length} explorer{footsteps.length === 1 ? "" : "s"} have
-          left their mark
+        <p className="mb-6 font-text text-[13px] text-[#FCEE0A]">
+          ◈ {footsteps.length} Edge Runners{footsteps.length === 1 ? "" : "s"}{" "}
+          have left their marks
         </p>
 
         <div
@@ -169,7 +176,7 @@ export default function Guestbook() {
                 className="absolute"
                 style={{ left: `${f.x}%`, top: `${f.y}%` }}
               >
-                <Pin name={f.name} fresh={f._fresh} />
+                <Pin name={f.name} fresh={f._fresh} is_owner={f.is_owner} />
               </div>
             ))}
 

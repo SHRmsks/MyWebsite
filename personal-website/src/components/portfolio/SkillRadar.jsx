@@ -90,12 +90,13 @@ export default function SkillRadar({ attributes }) {
         stroke="#39c4b6"
         strokeWidth="2"
         style={{
-          transformOrigin: `${C}px ${C}px`,
+          originX: "50%",
+          originY: "50%",
           filter: "drop-shadow(0 0 6px rgba(57,196,182,0.6))",
         }}
         initial={{ scale: 0, opacity: 0 }}
         whileInView={{ scale: 1, opacity: 1 }}
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.1 }}
         transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.1 }}
       />
 

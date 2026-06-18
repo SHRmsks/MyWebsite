@@ -101,9 +101,9 @@ export default function Projects() {
 
   return (
     <Section id="projects" index={4} title="Projects">
-      <p className="relative font-cyberpunk text-left text-[#FCEE0A] drop-shadow-[0_0_14px_rgba(252,238,10,0.35)] text-[20px] sm:text-[15px] ">
+      <p className="relative font-cyberpunk text-left text-[#bcd6d0] drop-shadow-[0_0_14px_rgba(252,238,10,0.35)] text-[20px] sm:text-[15px] ">
         {" "}
-        Click in box for details{" "}
+        Click icons for further details...
       </p>
       <div className="relative mx-auto flex max-w-[820px] flex-col items-center gap-20 py-4">
         {/* central spine */}

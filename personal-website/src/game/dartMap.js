@@ -145,15 +145,16 @@ export class DartMap {
   }
 
   _renderPins(footsteps) {
-    footsteps.forEach((f) => this._addPin(f.x, f.y, false));
+    footsteps.forEach((f) => this._addPin(f.x, f.y, false, f.is_owner));
   }
 
-  _addPin(x, y, fresh) {
+  _addPin(x, y, fresh, isOwner = false) {
     const lx = (x / 100 - 0.5) * W;
     const ly = (0.5 - y / 100) * H;
+    const pinColor = isOwner ? new THREE.Color(0x00ff00) : PIN;
     const pin = new THREE.Mesh(
-      new THREE.CircleGeometry(0.007, 16), // <-- FIX: Thinner and smaller dots
-      new THREE.MeshBasicMaterial({ color: PIN }),
+      new THREE.CircleGeometry(0.004, 16), // <-- FIX: Thinner and smaller dots
+      new THREE.MeshBasicMaterial({ color: pinColor }),
     );
     pin.position.set(lx, ly, 0.015); // Pushed closer to the map to feel thinner
     pin.userData.fresh = fresh ? 0.6 : 0;

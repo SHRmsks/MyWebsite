@@ -11,8 +11,7 @@ export default function Contact() {
     <Section id="contact" index={6} title="Contact">
       <Reveal>
         <p className="mb-8 max-w-[560px] font-text text-[15px] leading-[1.7] text-[#bcd6d0]">
-          Want to build something, collaborate, or just say hi? My channels are
-          open — reach out and let&apos;s make it.
+          Want to collaborate together? Time to Connect
         </p>
       </Reveal>
 
